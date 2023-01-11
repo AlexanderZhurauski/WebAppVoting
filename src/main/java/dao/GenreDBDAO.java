@@ -15,7 +15,11 @@ public class GenreDBDAO implements IGenreDAO {
     private static final String SELECT_ALL = "SELECT id, name FROM app.genres;";
     private static final String SELECT_BY_ID = "SELECT id, name FROM app.genres" +
             " WHERE id = ?";
-
+    private static final String ADD = "INSERT INTO app.genres (name) VALUES (?);";
+    private static final String UPDATE = "UPDATE app.genres SET name=? WHERE id=?;";
+    private static final String COUNT_VOTES = "SELECT COUNT(id) AS count FROM app.genres " +
+            "GROUP BY id HAVING id=?;";
+    private static final String DELETE = "DELETE FROM app.genres WHERE id=?;";
     @Override
     public List<GenreDTO> getAll() {
         try (Connection connection = ConnectionManager.open();
@@ -58,6 +62,48 @@ public class GenreDBDAO implements IGenreDAO {
                 } else {
                     throw new IllegalArgumentException(String
                             .format("No genre with id %d was found!", id));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void add(String genre) {
+        try (Connection conn = ConnectionManager.open();
+             PreparedStatement statement = conn.prepareStatement(ADD)) {
+            statement.setString(1, genre);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void update(int id, String genre) {
+        try (Connection conn = ConnectionManager.open();
+             PreparedStatement statement = conn.prepareStatement(UPDATE)) {
+            statement.setString(1, genre);
+            statement.setInt(2, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        try (Connection conn = ConnectionManager.open();
+             PreparedStatement statement = conn.prepareStatement(COUNT_VOTES)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.getInt("count") == 0) {
+                    try (PreparedStatement delStatement = conn.prepareStatement(DELETE)) {
+                        delStatement.setInt(1, id);
+                        delStatement.executeUpdate();
+                    }
+                } else {
+                    throw new IllegalArgumentException("genre can't be deleted: it has votes");
                 }
             }
         } catch (SQLException e) {
