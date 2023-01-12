@@ -11,4 +11,10 @@ public interface IGenreDAO {
     boolean exists(int id);
 
     GenreDTO get(int id);
+
+    void add(String genre);
+
+    void update(int id, String genre);
+
+    void delete(int id);
 }

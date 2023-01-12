@@ -1,18 +1,28 @@
 package dao;
 
 import dao.api.IGenreDAO;
+import dto.ArtistDTO;
 import dto.GenreDTO;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class GenreMemoryDAO implements IGenreDAO {
 
     private final Map<Integer, GenreDTO> genres;
+    private final ReadWriteLock lock;
+    private final Lock writeLock;
+    private final Lock readLock;
 
     public GenreMemoryDAO() {
-        genres = new HashMap<>();
+        genres = new ConcurrentHashMap<>();
+        lock = new ReentrantReadWriteLock();
+        writeLock = lock.writeLock();
+        readLock = lock.readLock();
         genres.put(1, new GenreDTO(1, "Pop"));
         genres.put(2, new GenreDTO(2, "Rap"));
         genres.put(3, new GenreDTO(3, "Techno"));
@@ -27,16 +37,83 @@ public class GenreMemoryDAO implements IGenreDAO {
 
     @Override
     public List<GenreDTO> getAll() {
-        return List.copyOf(genres.values());
+        try {
+            readLock.lock();
+
+            return List.copyOf(genres.values());
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @Override
     public boolean exists(int id) {
-        return genres.containsKey(id);
+        try {
+            readLock.lock();
+
+            return genres.containsKey(id);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @Override
     public GenreDTO get(int id) {
-        return genres.get(id);
+        try {
+            readLock.lock();
+
+            GenreDTO genre = genres.get(id);
+            if (genre != null) {
+                return genre;
+            } else {
+                throw new IllegalArgumentException("No genre returned for id "
+                        + id);
+            }
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    @Override
+    public void add(String genre) {
+        try {
+            writeLock.lock();
+
+            int newId = getNewID();
+            genres.put(newId, new GenreDTO(newId, genre));
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    @Override
+    public void update(int id, String genre) {
+        try {
+            writeLock.lock();
+
+            genres.put(id, new GenreDTO(id, genre));
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        try {
+            writeLock.lock();
+
+            genres.remove(id);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    private int getNewID() {
+        int newID = genres.keySet()
+                .stream()
+                .max(Integer::compareTo)
+                .get() + 1;
+
+        return newID;
     }
 }

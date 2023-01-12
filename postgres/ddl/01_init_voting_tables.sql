@@ -1,7 +1,15 @@
+CREATE SCHEMA IF NOT EXISTS app;
+
 CREATE TABLE IF NOT EXISTS app.genres(
     id BIGSERIAL,
     name VARCHAR(30),
-    CONSTRAINT pk_id PRIMARY KEY (id)
+    CONSTRAINT pk_genre_id PRIMARY KEY (id)
+);
+
+CREATE TABLE app.artist (
+    id BIGSERIAL NOT NULL,
+    name TEXT NOT NULL,
+    CONSTRAINT pk_artist_id PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS app.votes(

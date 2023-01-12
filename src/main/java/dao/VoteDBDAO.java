@@ -1,6 +1,5 @@
 package dao;
 
-import dao.api.IGenreDAO;
 import dao.api.IVoteDAO;
 import dao.util.ConnectionManager;
 import dto.SavedVoteDTO;
