@@ -20,11 +20,9 @@ import java.util.List;
 public class VoteServlet extends HttpServlet {
 
     private final IVoteService service;
-    private final ISenderService senderService;
 
     public VoteServlet() {
         this.service = VoteServiceSingleton.getInstance();
-        this.senderService = SenderServiceSingleton.getInstance();
     }
 
     @Override
@@ -49,7 +47,6 @@ public class VoteServlet extends HttpServlet {
 
         SavedVoteDTO savedVote = new SavedVoteDTO(vote);
         service.save(savedVote);
-        senderService.send(savedVote);
 
         String contextPath = req.getContextPath();
         resp.sendRedirect(contextPath + "/results");
