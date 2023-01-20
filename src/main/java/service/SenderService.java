@@ -67,7 +67,7 @@ public class SenderService implements ISenderService {
         StringBuilder messageText = new StringBuilder();
         String recipient = vote.getVoteDTO()
                 .getEmail();
-        MimeMessage message = createMessage(vote, messageText);;
+        MimeMessage message = createMessage(vote, messageText);
 
         try {
             message.setFrom(new InternetAddress(SENDER));
@@ -81,6 +81,32 @@ public class SenderService implements ISenderService {
                     "the confirmation email", e);
         }
     }
+
+    @Override
+    public void send(String email, String verificationLink) {
+        Authenticator authenticator = new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(SENDER,
+                        PASSWORD);
+            }
+        };
+        Session session = Session.getInstance(mailProperties,
+                authenticator);
+        MimeMessage message = new MimeMessage(session);
+
+        try {
+            message.setFrom(new InternetAddress(SENDER));
+            message.setRecipients(Message.RecipientType.TO,
+                    email);
+            message.setSubject(TOPIC);
+            message.setText(verificationLink);
+            Transport.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send to send " +
+                    "the validation email", e);
+        }
+    }
+
 
     private MimeMessage createMessage(SavedVoteDTO vote, StringBuilder messageText) {
         Authenticator authenticator = new javax.mail.Authenticator() {
