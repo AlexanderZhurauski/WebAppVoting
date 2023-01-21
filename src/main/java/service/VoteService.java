@@ -7,9 +7,13 @@ import service.api.IArtistService;
 import service.api.IGenreService;
 import service.api.ISenderService;
 import service.api.IVoteService;
+import service.tasks.SendTask;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class VoteService implements IVoteService {
 
@@ -17,6 +21,7 @@ public class VoteService implements IVoteService {
     private final IGenreService genreService;
     private final IArtistService artistService;
     private final ISenderService senderService;
+    private final ExecutorService executorService;
     private static final String EMAIL_PATTERN = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*"
             + "@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
@@ -29,6 +34,7 @@ public class VoteService implements IVoteService {
         this.genreService = genreService;
         this.artistService = artistService;
         this.senderService = senderService;
+        this.executorService = Executors.newFixedThreadPool(8);
     }
 
     @Override
@@ -39,7 +45,13 @@ public class VoteService implements IVoteService {
     @Override
     public void save(SavedVoteDTO vote) {
         voteDAO.save(vote);
-        senderService.send(vote);
+        SendTask sendTask = new SendTask(vote, senderService, 5, 1_800_000);
+        try {
+            executorService.submit(sendTask);
+        } catch (Throwable e) {
+            System.err.println("Failed to send the confirmation email to '"
+                    + vote.getVoteDTO().getEmail() + "'");
+        }
     }
 
     @Override
