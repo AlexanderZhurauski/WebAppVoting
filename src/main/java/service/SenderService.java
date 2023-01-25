@@ -8,6 +8,7 @@ import service.api.IGenreService;
 import service.api.ISenderService;
 
 import javax.mail.*;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +22,8 @@ public class SenderService implements ISenderService {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm");
     private static final String SENDER_PROMPT = "sender";
     private static final String PASSWORD_PROMPT = "password";
-    private static final String TOPIC = "WebAppVoting Vote Confirmation";
+    private static final String CONFIRMATION_SUBJECT = "WebAppVoting Vote Confirmation";
+    private static final String VALIDATION_SUBJECT = "WebAppVoting Email Validation";
     private static final String TRANSPORT_PROTOCOL = "mail.transport.protocol";
     private static final String SERVICE_HOST = "mail.host";
     private static final String SMPT_AUTHENTICATION = "mail.smtp.auth";
@@ -63,27 +65,38 @@ public class SenderService implements ISenderService {
     }
 
     @Override
-    public void send(SavedVoteDTO vote) {
-        StringBuilder messageText = new StringBuilder();
-        String recipient = vote.getVoteDTO()
-                .getEmail();
-        MimeMessage message = createMessage(vote, messageText);;
-
+    public void sendVoteConfirmation(SavedVoteDTO vote) {
+        String recipient = vote.getVoteDTO().getEmail();
+        String messageText = createVoteConfirmationText(vote);
         try {
-            message.setFrom(new InternetAddress(SENDER));
-            message.setRecipients(Message.RecipientType.TO,
-                    recipient);
-            message.setSubject(TOPIC);
-            message.setText(messageText.toString());
-            Transport.send(message);
+            send(recipient, CONFIRMATION_SUBJECT, messageText);
+        } catch (AddressException e) {
+            throw new RuntimeException("Failed to send the confirmation email " +
+                    "due to wrongly formatted address ", e);
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send to send " +
+            throw new RuntimeException("Failed to send " +
                     "the confirmation email", e);
         }
+
     }
 
-    private MimeMessage createMessage(SavedVoteDTO vote, StringBuilder messageText) {
+    @Override
+    public void sendVerificationLink(String email, String verificationLink) {
+        try {
+            send(email, VALIDATION_SUBJECT, verificationLink);
+        } catch (AddressException e) {
+            throw new RuntimeException("Failed to send the validation email " +
+                    "due to wrongly formatted address ", e);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send " +
+                    "the validation email", e);
+        }
+
+    }
+
+    private void send(String recipient, String subject, String messageText) throws MessagingException {
         Authenticator authenticator = new javax.mail.Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(SENDER,
                         PASSWORD);
@@ -92,19 +105,31 @@ public class SenderService implements ISenderService {
         Session session = Session.getInstance(mailProperties,
                 authenticator);
         MimeMessage message = new MimeMessage(session);
+        InternetAddress address = new InternetAddress(SENDER);
+        message.setFrom(address);
+        message.setRecipients(Message.RecipientType.TO,
+                recipient);
+        message.setSubject(subject);
+        message.setText(messageText);
+        Transport.send(message);
+    }
 
+    private String createVoteConfirmationText(SavedVoteDTO vote) {
+        StringBuilder messageText = new StringBuilder();
         VoteDTO voteDTO = vote.getVoteDTO();
         messageText.append("Thank you for submitting your vote!\n");
-        appendGenreNames(voteDTO, messageText);
-        appendArtistName(voteDTO, messageText);
-        appendAbout(voteDTO, messageText);
+        messageText.append(getFormattedGenreNames(voteDTO));
+        messageText.append(getFormattedArtistName(voteDTO));
+        messageText.append(getFormattedAbout(voteDTO));
         messageText.append("Vote date: ");
         messageText.append(vote.getCreateDataTime().format(formatter));
 
-        return message;
+        return messageText.toString();
     }
 
-    private void appendGenreNames(VoteDTO voteDTO, StringBuilder message) {
+
+    private String getFormattedGenreNames(VoteDTO voteDTO) {
+        StringBuilder message = new StringBuilder();
         message.append("Your genre vote:\n");
         List<Integer> genreIDs = voteDTO.getGenreIds();
         for (int i = 0; i < genreIDs.size(); i++) {
@@ -113,19 +138,22 @@ public class SenderService implements ISenderService {
                     .append(this.genreService.get(genreIDs.get(i)).getGenre())
                     .append("\n");
         }
+        return message.toString();
     }
 
-    private void appendArtistName(VoteDTO voteDTO, StringBuilder message) {
+    private String getFormattedArtistName(VoteDTO voteDTO) {
+        StringBuilder message = new StringBuilder();
         message.append("Your artist vote:\n");
         int artistID = voteDTO.getArtistId();
         message.append("1. ")
                 .append(this.artistService.get(artistID).getArtist())
                 .append("\n");
+        return message.toString();
     }
 
-    private void appendAbout(VoteDTO voteDTO, StringBuilder message) {
-        message.append("Your about text:\n");
-        message.append(voteDTO.getAbout())
-                .append("\n");
+    private String getFormattedAbout(VoteDTO voteDTO) {
+        return "Your about text:\n" +
+                voteDTO.getAbout() +
+                "\n";
     }
 }

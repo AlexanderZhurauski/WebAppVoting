@@ -12,6 +12,7 @@ public class RequestParamHandler {
     public static final String ABOUT_PARAM_NAME = "about";
     public static final String ID_PARAM_NAME = "id";
     public static final String EMAIL_PARAM_NAME = "email";
+    public static final String VERIFICATION_KEY = "key";
 
     public static String getRequestParam(HttpServletRequest req, String name) {
         String[] param = req.getParameterValues(name);
@@ -39,6 +40,7 @@ public class RequestParamHandler {
                     " parameter provided");
         }
     }
+
     public static List<Integer> getID(HttpServletRequest req, String name)
             throws IllegalArgumentException {
 

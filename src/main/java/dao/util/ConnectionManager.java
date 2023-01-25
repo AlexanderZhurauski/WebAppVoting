@@ -33,4 +33,9 @@ public class ConnectionManager implements IConnection {
     public Connection open() throws SQLException {
         return cpds.getConnection();
     }
+
+    @Override
+    public void close() throws Exception {
+        cpds.close();
+    }
 }
