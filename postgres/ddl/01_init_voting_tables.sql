@@ -14,7 +14,7 @@ CREATE TABLE app.artist (
 
 CREATE TABLE IF NOT EXISTS app.votes(
     id BIGSERIAL,
-    artist_id INT NOT NULL,
+    artist_id BIGINT NOT NULL,
     about TEXT NOT NULL,
     creation_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     email TEXT NOT NULL UNIQUE,

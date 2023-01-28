@@ -1,5 +1,7 @@
 package dto;
 
+import dao.entity.GenreEntity;
+
 import java.util.Objects;
 
 public class GenreDTO {
@@ -10,6 +12,11 @@ public class GenreDTO {
     public GenreDTO(int id, String genre) {
         this.id = id;
         this.genre = genre;
+    }
+
+    public GenreDTO(GenreEntity entity) {
+        this.id = entity.getId().intValue();
+        this.genre = entity.getGenre();
     }
 
     public int getId() {

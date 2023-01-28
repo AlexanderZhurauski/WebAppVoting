@@ -1,5 +1,7 @@
 package dto;
 
+import dao.entity.ArtistEntity;
+
 import java.util.Objects;
 
 public class ArtistDTO {
@@ -10,6 +12,11 @@ public class ArtistDTO {
     public ArtistDTO(int id, String artist) {
         this.id = id;
         this.artist = artist;
+    }
+
+    public ArtistDTO(ArtistEntity entity) {
+        this.id = entity.getId().intValue();
+        this.artist = entity.getArtist();
     }
 
     public int getId() {
