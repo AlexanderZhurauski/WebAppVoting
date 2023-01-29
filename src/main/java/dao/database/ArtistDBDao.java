@@ -6,7 +6,6 @@ import dao.factories.ConnectionSingleton;
 import dto.ArtistDTO;
 
 import javax.persistence.EntityManager;
-import javax.persistence.RollbackException;
 import java.util.List;
 
 public class ArtistDBDao implements IArtistDAO {

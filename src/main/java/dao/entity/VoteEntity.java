@@ -19,14 +19,15 @@ public class VoteEntity {
     @ManyToMany(mappedBy = "votes")
     private List<GenreEntity> genreIds = new ArrayList<>();
     private String about;
-    private LocalDateTime creation_time;
+    @Column(name = "creation_time")
+    private LocalDateTime creationTime;
     private String email;
 
     public VoteEntity(ArtistEntity artistEntity, String about,
-                      LocalDateTime creation_time, String email) {
+                      LocalDateTime creationTime, String email) {
         this.artistId = artistEntity;
         this.about = about;
-        this.creation_time = creation_time;
+        this.creationTime = creationTime;
         this.email = email;
     }
 
@@ -45,8 +46,8 @@ public class VoteEntity {
         return about;
     }
 
-    public LocalDateTime getCreation_time() {
-        return creation_time;
+    public LocalDateTime getCreationTime() {
+        return creationTime;
     }
 
     public String getEmail() {
@@ -65,8 +66,8 @@ public class VoteEntity {
         this.about = about;
     }
 
-    public void setCreation_time(LocalDateTime creation_time) {
-        this.creation_time = creation_time;
+    public void setCreationTime(LocalDateTime creationTime) {
+        this.creationTime = creationTime;
     }
 
     public void setEmail(String email) {
@@ -89,12 +90,12 @@ public class VoteEntity {
         return Objects.equals(id, that.id)
                 && Objects.equals(artistId, that.artistId)
                 && Objects.equals(about, that.about)
-                && Objects.equals(creation_time, that.creation_time)
+                && Objects.equals(creationTime, that.creationTime)
                 && Objects.equals(email, that.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, artistId, about, creation_time, email);
+        return Objects.hash(id, artistId, about, creationTime, email);
     }
 }

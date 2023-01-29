@@ -1,10 +1,8 @@
 package dao.database;
 
 import dao.api.IGenreDAO;
-import dao.entity.ArtistEntity;
 import dao.entity.GenreEntity;
 import dao.factories.ConnectionSingleton;
-import dto.ArtistDTO;
 import dto.GenreDTO;
 
 import javax.persistence.EntityManager;

@@ -10,8 +10,6 @@ import dto.VoteDTO;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +31,7 @@ public class VoteDBDAO implements IVoteDAO {
                     vote.getGenreIds().stream().map(GenreEntity::getId).collect(Collectors.toList()),
                     vote.getAbout(),
                     vote.getEmail()
-                    ), vote.getCreation_time()))
+                    ), vote.getCreationTime()))
                 .collect(Collectors.toList());
 
         open.getTransaction().commit();
