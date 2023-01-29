@@ -1,7 +1,7 @@
 package dao.entity;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 @Entity
 @Table (name = "artist", schema = "app")
@@ -12,6 +12,9 @@ public class ArtistEntity {
     private Long id;
     @Column(name = "name")
     private String artist;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "artist_id")
+    private List<VoteEntity> votes;
 
     public ArtistEntity(){
     }
@@ -29,6 +32,18 @@ public class ArtistEntity {
 
     public void setArtist(String artist) {
         this.artist = artist;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<VoteEntity> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(List<VoteEntity> votes) {
+        this.votes = votes;
     }
 
     @Override

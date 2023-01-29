@@ -8,13 +8,13 @@ public interface IGenreService {
 
     List<GenreDTO> getAll();
 
-    GenreDTO get(int id);
+    GenreDTO get(long id);
 
-    boolean exists(int id);
+    boolean exists(long id);
 
     void add(String genre);
 
-    void update(int id, String genre);
+    void update(long id, String genre);
 
-    void delete(int id);
+    void delete(long id);
 }

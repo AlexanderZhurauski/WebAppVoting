@@ -25,12 +25,11 @@ public class ArtistDBDao implements IArtistDAO {
     }
 
     @Override
-    public boolean exists(int id) {
-        Long l = (long) id;
+    public boolean exists(long id) {
         boolean bool = false;
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        if (entityManager.find(ArtistEntity.class, l) != null) {
+        if (entityManager.find(ArtistEntity.class, id) != null) {
             bool = true;
         }
         entityManager.getTransaction().commit();
@@ -38,11 +37,10 @@ public class ArtistDBDao implements IArtistDAO {
     }
 
     @Override
-    public ArtistDTO get(int id) {
-        Long l = (long) id;
+    public ArtistDTO get(long id) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        ArtistDTO artistDTO = entityManager.find(ArtistDTO.class, l);
+        ArtistDTO artistDTO = entityManager.find(ArtistDTO.class, id);
         entityManager.getTransaction().commit();
         return artistDTO;
     }
@@ -56,21 +54,19 @@ public class ArtistDBDao implements IArtistDAO {
     }
 
     @Override
-    public void update(int id, String artist) {
-        Long l = (long) id;
+    public void update(long id, String artist) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, l);
+        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
         artistEntity.setArtist(artist);
         entityManager.getTransaction().commit();
     }
 
     @Override
-    public void delete(int id) {
-        Long l = (long) id;
+    public void delete(long id) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, l);
+        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
         entityManager.remove(artistEntity);
         entityManager.getTransaction().commit();
 

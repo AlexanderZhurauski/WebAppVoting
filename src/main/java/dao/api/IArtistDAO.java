@@ -8,13 +8,13 @@ public interface IArtistDAO {
 
     List<ArtistDTO> getAll();
 
-    boolean exists(int id);
+    boolean exists(long id);
 
-    ArtistDTO get(int id);
+    ArtistDTO get(long id);
 
     void add(String artist);
 
-    void update(int id, String artist);
+    void update(long id, String artist);
 
-    void delete(int id);
+    void delete(long id);
 }

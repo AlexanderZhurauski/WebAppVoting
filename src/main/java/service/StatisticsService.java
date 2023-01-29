@@ -33,10 +33,10 @@ public class StatisticsService implements IStatisticsService {
     }
 
     @Override
-    public Map<ArtistDTO, Integer> getBestArtists() {
-        final Map<Integer, Integer> artistVotes = artistService.getAll()
+    public Map<ArtistDTO, Long> getBestArtists() {
+        final Map<Long, Long> artistVotes = artistService.getAll()
                 .stream()
-                .collect(Collectors.toMap(ArtistDTO::getId, artist -> 0));
+                .collect(Collectors.toMap(ArtistDTO::getId, artist -> 0L));
         voteService.getAll()
                 .stream()
                 .map(SavedVoteDTO::getVoteDTO)
@@ -47,22 +47,22 @@ public class StatisticsService implements IStatisticsService {
         return sortArtistsByVotes(artistVotes);
     }
 
-    private Map<ArtistDTO, Integer> sortArtistsByVotes(Map<Integer, Integer> artists) {
+    private Map<ArtistDTO, Long> sortArtistsByVotes(Map<Long, Long> artists) {
         return artists.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(
                         entry -> artistService.get(entry.getKey()),
                         Map.Entry::getValue,
-                        Integer::sum,
+                        Long::sum,
                         LinkedHashMap::new));
     }
 
     @Override
-    public Map<GenreDTO, Integer> getBestGenres() {
-        final Map<Integer, Integer> genreVotes = genreService.getAll()
+    public Map<GenreDTO, Long> getBestGenres() {
+        final Map<Long, Long> genreVotes = genreService.getAll()
                 .stream()
-                .collect(Collectors.toMap(GenreDTO::getId, genre -> 0));
+                .collect(Collectors.toMap(GenreDTO::getId, genre -> 0L));
         voteService.getAll()
                 .stream()
                 .map(SavedVoteDTO::getVoteDTO)
@@ -74,14 +74,14 @@ public class StatisticsService implements IStatisticsService {
         return sortGenresByVotes(genreVotes);
     }
 
-    private Map<GenreDTO, Integer> sortGenresByVotes(Map<Integer, Integer> genres) {
+    private Map<GenreDTO, Long> sortGenresByVotes(Map<Long, Long> genres) {
         return genres.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(
                         entry -> genreService.get(entry.getKey()),
                         Map.Entry::getValue,
-                        Integer::sum,
+                        Long::sum,
                         LinkedHashMap::new));
     }
 

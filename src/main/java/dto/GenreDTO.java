@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class GenreDTO {
 
-    private final int id;
+    private final long id;
     private final String genre;
 
     public GenreDTO(int id, String genre) {
@@ -19,7 +19,7 @@ public class GenreDTO {
         this.genre = entity.getGenre();
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

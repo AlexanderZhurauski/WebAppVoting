@@ -25,12 +25,11 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public boolean exists(int id) {
-        Long l = (long) id;
+    public boolean exists(long id) {
         boolean bool = false;
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        if (entityManager.find(GenreEntity.class, l) != null) {
+        if (entityManager.find(GenreEntity.class, id) != null) {
             bool = true;
         }
         entityManager.getTransaction().commit();
@@ -38,11 +37,10 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public GenreDTO get(int id) {
-        Long l = (long) id;
+    public GenreDTO get(long id) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        GenreDTO genreDTO = new GenreDTO(entityManager.find(GenreEntity.class, l));
+        GenreDTO genreDTO = new GenreDTO(entityManager.find(GenreEntity.class, id));
         entityManager.getTransaction().commit();
         return genreDTO;
     }
@@ -56,21 +54,19 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public void update(int id, String genre) {
-        Long l = (long) id;
+    public void update(long id, String genre) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        GenreEntity genreEntity = entityManager.find(GenreEntity.class, l);
+        GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
         genreEntity.setGenre(genre);
         entityManager.getTransaction().commit();
     }
 
     @Override
-    public void delete(int id) {
-        Long l = (long) id;
+    public void delete(long id) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        GenreEntity genreEntity = entityManager.find(GenreEntity.class, l);
+        GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
         entityManager.remove(genreEntity);
         entityManager.getTransaction().commit();
     }

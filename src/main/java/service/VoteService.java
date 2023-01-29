@@ -7,13 +7,11 @@ import service.api.IArtistService;
 import service.api.IGenreService;
 import service.api.ISenderService;
 import service.api.IVoteService;
-import service.tasks.SendTask;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class VoteService implements IVoteService {
 
@@ -45,21 +43,14 @@ public class VoteService implements IVoteService {
     @Override
     public void save(SavedVoteDTO vote) {
         voteDAO.save(vote);
-        SendTask sendTask = new SendTask(vote, senderService, 5, 1_800_000);
-        try {
-            executorService.submit(sendTask);
-        } catch (Throwable e) {
-            System.err.println("Failed to send the confirmation email to '"
-                    + vote.getVoteDTO().getEmail() + "'");
-        }
     }
 
     @Override
     public void validate(VoteDTO vote) {
-        int artistId = vote.getArtistId();
+        long artistId = vote.getArtistId();
         validateArtist(artistId);
 
-        List<Integer> genresIdList = vote.getGenreIds();
+        List<Long> genresIdList = vote.getGenreIds();
         validateGenres(genresIdList);
 
         String about = vote.getAbout();
@@ -69,14 +60,14 @@ public class VoteService implements IVoteService {
         validateEmail(email);
     }
 
-    private void validateArtist(int artistId) {
+    private void validateArtist(long artistId) {
         if (!artistService.exists(artistId)) {
             throw new NoSuchElementException("Invalid artist id " +
                     "provided - '" + artistId + "' ");
         }
     }
 
-    private void validateGenres(List<Integer> genresIdList) {
+    private void validateGenres(List<Long> genresIdList) {
 
         if (genresIdList.size() < 3 || genresIdList.size() > 5) {
             throw new IllegalArgumentException("Number of genres outside" +
@@ -88,7 +79,7 @@ public class VoteService implements IVoteService {
             throw new IllegalArgumentException("Genre parameter " +
                     "must be non-repeating ");
         }
-        for (int genreId : genresIdList) {
+        for (long genreId : genresIdList) {
             if (!genreService.exists(genreId)) {
                 throw new NoSuchElementException("Invalid genre id " +
                         "provided - '" + genreId + "' ");

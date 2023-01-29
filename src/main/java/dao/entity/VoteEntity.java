@@ -2,6 +2,8 @@ package dao.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -11,16 +13,18 @@ public class VoteEntity {
     @GeneratedValue(generator = "votes_seq",strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "votes_seq",sequenceName = "votes_id_seq",schema = "app",allocationSize = 1)
     private Long id;
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "id")
-    private ArtistEntity artist_id;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "artist_id")
+    private ArtistEntity artistId;
+    @ManyToMany(mappedBy = "votes")
+    private List<GenreEntity> genreIds = new ArrayList<>();
     private String about;
     private LocalDateTime creation_time;
     private String email;
 
     public VoteEntity(ArtistEntity artistEntity, String about,
                       LocalDateTime creation_time, String email) {
-        this.artist_id = artistEntity;
+        this.artistId = artistEntity;
         this.about = about;
         this.creation_time = creation_time;
         this.email = email;
@@ -33,8 +37,8 @@ public class VoteEntity {
         return id;
     }
 
-    public ArtistEntity getArtist_id() {
-        return artist_id;
+    public ArtistEntity getArtistId() {
+        return artistId;
     }
 
     public String getAbout() {
@@ -53,8 +57,8 @@ public class VoteEntity {
         this.id = id;
     }
 
-    public void setArtist_id(ArtistEntity artist_id) {
-        this.artist_id = artist_id;
+    public void setArtistId(ArtistEntity artistId) {
+        this.artistId = artistId;
     }
 
     public void setAbout(String about) {
@@ -69,13 +73,21 @@ public class VoteEntity {
         this.email = email;
     }
 
+    public List<GenreEntity> getGenreIds() {
+        return genreIds;
+    }
+
+    public void setGenreIds(List<GenreEntity> genreIds) {
+        this.genreIds = genreIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VoteEntity that = (VoteEntity) o;
         return Objects.equals(id, that.id)
-                && Objects.equals(artist_id, that.artist_id)
+                && Objects.equals(artistId, that.artistId)
                 && Objects.equals(about, that.about)
                 && Objects.equals(creation_time, that.creation_time)
                 && Objects.equals(email, that.email);
@@ -83,6 +95,6 @@ public class VoteEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, artist_id, about, creation_time, email);
+        return Objects.hash(id, artistId, about, creation_time, email);
     }
 }

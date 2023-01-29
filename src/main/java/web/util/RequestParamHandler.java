@@ -32,16 +32,16 @@ public class RequestParamHandler {
         return param[0];
     }
 
-    public static int getID(String id) {
+    public static long getID(String id) {
         try {
-            return Integer.parseInt(id);
+            return Long.parseLong(id);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid " + id +
                     " parameter provided");
         }
     }
 
-    public static List<Integer> getID(HttpServletRequest req, String name)
+    public static List<Long> getID(HttpServletRequest req, String name)
             throws IllegalArgumentException {
 
         String[] ids = req.getParameterValues(name);
