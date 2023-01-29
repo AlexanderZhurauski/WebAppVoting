@@ -16,48 +16,70 @@ import java.util.stream.Collectors;
 public class VoteDBDAO implements IVoteDAO {
     @Override
     public List<SavedVoteDTO> getAll() {
-        EntityManager open = ConnectionSingleton.getInstance().open();
-        open.getTransaction().begin();
         List<SavedVoteDTO> savedVoteDTOs;
         List<VoteEntity> voteEntities;
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
-        Query query = open.createQuery("SELECT v FROM VoteEntity v");
-        voteEntities = query.getResultList();
-
+            Query query = entityManager.createQuery("SELECT v FROM VoteEntity v");
+            voteEntities = query.getResultList();
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
         savedVoteDTOs = voteEntities
                 .stream()
                 .map(vote -> new SavedVoteDTO(new VoteDTO(
-                    vote.getArtistId().getId(),
-                    vote.getGenreIds().stream().map(GenreEntity::getId).collect(Collectors.toList()),
-                    vote.getAbout(),
-                    vote.getEmail()
-                    ), vote.getCreationTime()))
+                        vote.getArtistId().getId(),
+                        vote.getGenreIds().stream().map(GenreEntity::getId).collect(Collectors.toList()),
+                        vote.getAbout(),
+                        vote.getEmail()
+                ), vote.getCreationTime()))
                 .collect(Collectors.toList());
-
-        open.getTransaction().commit();
-        open.close();
 
         return savedVoteDTOs;
     }
     @Override
     public void save(SavedVoteDTO vote) {
-        EntityManager open = ConnectionSingleton.getInstance().open();
-        open.getTransaction().begin();
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
 
-        ArtistEntity artistEntity = open.find(ArtistEntity.class,vote.getVoteDTO().getArtistId());
-        System.out.println(artistEntity.getId());
+            entityManager.getTransaction().begin();
 
-        List<Long> genreIds = vote.getVoteDTO().getGenreIds();
-        Query getGenres = open.createQuery("SELECT g FROM GenreEntity g WHERE id IN (:genreIds)");
-        getGenres.setParameter("genreIds", genreIds);
-        List<GenreEntity> genres = getGenres.getResultList();
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class,vote.getVoteDTO().getArtistId());
+            System.out.println(artistEntity.getId());
 
-        VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
-                vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
-        artistEntity.getVotes().add(voteEntity);
-        genres.forEach(genre -> genre.addVote(voteEntity));
+            List<Long> genreIds = vote.getVoteDTO().getGenreIds();
+            Query getGenres = entityManager.createQuery("SELECT g FROM GenreEntity g WHERE id IN (:genreIds)");
+            getGenres.setParameter("genreIds", genreIds);
+            List<GenreEntity> genres = getGenres.getResultList();
 
-        open.getTransaction().commit();
-        open.close();
+            VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
+                    vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
+            artistEntity.getVotes().add(voteEntity);
+            genres.forEach(genre -> genre.addVote(voteEntity));
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 }
