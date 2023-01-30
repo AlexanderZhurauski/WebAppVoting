@@ -7,6 +7,7 @@ import dao.factories.ArtistDAOSingleton;
 import dao.factories.GenreDAOSingleton;
 import dao.factories.VoteDAOSingleton;
 import dto.ArtistDTO;
+import dto.GenreDTO;
 import dto.SavedVoteDTO;
 import dto.VoteDTO;
 
@@ -32,19 +33,19 @@ public class Main {
         IArtistDAO artistDAO = ArtistDAOSingleton.getInstance();
         IGenreDAO genreDAO = GenreDAOSingleton.getInstance();
 
-        System.out.println(artistDAO.exists(1));
+        System.out.println(genreDAO.exists(1));
 
-        ArtistDTO artistEntity = artistDAO.get(1);
-        System.out.println(artistEntity.getArtist());
+        GenreDTO genreDTO = genreDAO.get(1);
+        System.out.println(genreDTO.getGenre());
 
-        List<ArtistDTO> dtos = artistDAO.getAll();
-        dtos.stream().map(ArtistDTO::getArtist).forEach(System.out::println);
+        genreDAO.add("NewGenreLol");
 
-        artistDAO.update(6, "NotRandom");
-        System.out.println(artistDAO.get(6).getArtist());
+        List<GenreDTO> genres = genreDAO.getAll();
+        genres.stream().map(GenreDTO::getGenre).forEach(System.out::println);
 
-        artistDAO.delete(6);
-        dtos = artistDAO.getAll();
-        dtos.stream().map(ArtistDTO::getArtist).forEach(System.out::println);
+        genreDAO.delete(11);
+
+        genres = genreDAO.getAll();
+        genres.stream().map(GenreDTO::getGenre).forEach(System.out::println);
      }
 }

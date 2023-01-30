@@ -89,6 +89,9 @@ public class VoteDBDAO implements IVoteDAO {
             throw e;
         } finally {
             if (entityManager != null) {
+
+
+
                 entityManager.close();
             }
         }
