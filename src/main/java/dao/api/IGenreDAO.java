@@ -8,13 +8,13 @@ public interface IGenreDAO {
 
     List<GenreDTO> getAll();
 
-    boolean exists(int id);
+    boolean exists(long id);
 
-    GenreDTO get(int id);
+    GenreDTO get(long id);
 
     void add(String genre);
 
-    void update(int id, String genre);
+    void update(long id, String genre);
     
-    void delete(int id);
+    void delete(long id);
 }

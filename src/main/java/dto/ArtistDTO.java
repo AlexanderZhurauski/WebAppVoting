@@ -1,18 +1,25 @@
 package dto;
 
+import dao.entity.ArtistEntity;
+
 import java.util.Objects;
 
 public class ArtistDTO {
 
-    private final int id;
+    private final long id;
     private final String artist;
 
-    public ArtistDTO(int id, String artist) {
+    public ArtistDTO(long id, String artist) {
         this.id = id;
         this.artist = artist;
     }
 
-    public int getId() {
+    public ArtistDTO(ArtistEntity entity) {
+        this.id = entity.getId().intValue();
+        this.artist = entity.getArtist();
+    }
+
+    public long getId() {
         return id;
     }
 

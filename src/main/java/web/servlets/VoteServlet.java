@@ -19,6 +19,7 @@ import java.util.List;
 @WebServlet(name = "VoteServlet", urlPatterns = "/vote")
 public class VoteServlet extends HttpServlet {
 
+
     private final IVoteService voteService;
     private final ISenderService senderService;
     private static final String CHARACTER_ENCODING = "UTF-8";
@@ -38,8 +39,8 @@ public class VoteServlet extends HttpServlet {
 
         String id = RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.ARTIST_PARAM_NAME);
-        int artistId = RequestParamHandler.getID(id);
-        List<Integer> genreIds = RequestParamHandler.getID(req,
+        long artistId = RequestParamHandler.getID(id);
+        List<Long> genreIds = RequestParamHandler.getID(req,
                 RequestParamHandler.GENRE_PARAM_NAME);
         String about = RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.ABOUT_PARAM_NAME);
@@ -50,6 +51,7 @@ public class VoteServlet extends HttpServlet {
         voteService.validate(vote);
 
         SavedVoteDTO savedVote = new SavedVoteDTO(vote);
+
         voteService.save(savedVote);
         senderService.sendVoteConfirmation(savedVote);
 

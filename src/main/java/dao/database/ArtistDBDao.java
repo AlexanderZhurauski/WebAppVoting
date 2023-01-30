@@ -1,125 +1,167 @@
 package dao.database;
 
 import dao.api.IArtistDAO;
+import dao.entity.ArtistEntity;
 import dao.factories.ConnectionSingleton;
 import dto.ArtistDTO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 public class ArtistDBDao implements IArtistDAO {
 
-    private static final String GET_ALL = "SELECT id, name FROM app.artist;";
-    private static final String GET = "SELECT id, name FROM app.artist " +
-            "WHERE id = ?;";
-    private static final String ADD = "INSERT INTO app.artist (name) VALUES (?);";
-    private static final String UPDATE = "UPDATE app.artist SET name=? WHERE id=?;";
-    private static final String COUNT_VOTES = "SELECT COUNT(id) AS count FROM app.votes " +
-            "WHERE artist_id=?;";
-    private static final String DELETE = "DELETE FROM app.artist WHERE id=?;";
-
     @Override
     public List<ArtistDTO> getAll() {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement stmt = conn.prepareStatement(GET_ALL,
-                     ResultSet.TYPE_SCROLL_SENSITIVE,
-                     ResultSet.CONCUR_UPDATABLE);
-             ResultSet artists = stmt.executeQuery()) {
+        EntityManager entityManager = null;
+        List<ArtistDTO> list;
 
-            List<ArtistDTO> artistDTOs = new ArrayList<>();
-            while (artists.next()) {
-                artistDTOs.add(get(artists));
-            }
-            return artistDTOs;
-        } catch (SQLException e) {
-            throw new RuntimeException("database query error");
-        }
-    }
-
-    @Override
-    public boolean exists(int id) {
         try {
-            get(id);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+
+            list = entityManager.createQuery("from ArtistEntity ", ArtistEntity.class)
+                    .getResultStream()
+                    .map(ArtistDTO::new)
+                    .toList();
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
+
+        return list;
     }
 
     @Override
-    public ArtistDTO get(int id) {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement stmt = conn.prepareStatement(GET,
-                     ResultSet.TYPE_SCROLL_SENSITIVE,
-                     ResultSet.CONCUR_UPDATABLE)) {
+    public boolean exists(long id) {
+        EntityManager entityManager = null;
+        boolean bool = false;
 
-            stmt.setInt(1, id);
-            try (ResultSet artist = stmt.executeQuery()) {
-                if (artist.first()) {
-                    return get(artist);
-                } else {
-                    throw new IllegalArgumentException("artist with the" +
-                            " specified id does not exist");
-                }
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+
+            if (entityManager.find(ArtistEntity.class, id) != null) {
+                bool = true;
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("database query error");
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
+        return bool;
+    }
+
+    @Override
+    public ArtistDTO get(long id) {
+        EntityManager entityManager = null;
+        ArtistDTO artistDTO;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
+            artistDTO = new ArtistDTO(artistEntity);
+
+            entityManager.getTransaction().commit();
+
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+
+        return artistDTO;
     }
 
     @Override
     public void add(String artist) {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement statement = conn.prepareStatement(ADD)) {
-            statement.setString(1, artist);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
 
-    @Override
-    public void update(int id, String artist) {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement statement = conn.prepareStatement(UPDATE)) {
-            statement.setString(1, artist);
-            statement.setInt(2, id);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+            entityManager.persist(new ArtistEntity(artist));
 
-    @Override
-    public void delete(int id) {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement statement = conn.prepareStatement(COUNT_VOTES,
-                     ResultSet.TYPE_SCROLL_SENSITIVE,
-                     ResultSet.CONCUR_UPDATABLE)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.first();
-                if (resultSet.getInt("count") == 0) {
-                    try (PreparedStatement delStatement = conn.prepareStatement(DELETE)) {
-                        delStatement.setInt(1, id);
-                        delStatement.executeUpdate();
-                    }
-                } else {
-                    throw new IllegalArgumentException("artist can't be deleted: he has votes");
-                }
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
     }
 
-    private ArtistDTO get(ResultSet artist) throws SQLException {
-        return new ArtistDTO(
-                artist.getInt("id"),
-                artist.getString("name"));
+    @Override
+    public void update(long id, String artist) {
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
+            artistEntity.setArtist(artist);
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+    }
+
+    @Override
+    public void delete(long id) {
+        EntityManager entityManager = null;
+
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
+            entityManager.remove(artistEntity);
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 }

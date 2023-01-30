@@ -6,22 +6,22 @@ import java.util.List;
 public class VoteDTO {
 
     private final String email;
-    private final int artistId;
-    private final List<Integer> genreIds;
+    private final long artistId;
+    private final List<Long> genreIds;
     private final String about;
 
-    public VoteDTO(int artistId, List<Integer> genreIds, String about, String email) {
+    public VoteDTO(long artistId, List<Long> genreIds, String about, String email) {
         this.artistId = artistId;
         this.genreIds = genreIds;
         this.about = about;
         this.email = email;
     }
 
-    public int getArtistId() {
+    public long getArtistId() {
         return artistId;
     }
 
-    public List<Integer> getGenreIds() {
+    public List<Long> getGenreIds() {
         return Collections.unmodifiableList(genreIds);
     }
 
@@ -31,5 +31,15 @@ public class VoteDTO {
 
     public String getEmail() {
         return email;
+    }
+
+    @Override
+    public String toString() {
+        return "VoteDTO{" +
+                "email='" + email + '\'' +
+                ", artistId=" + artistId +
+                ", genreIds=" + genreIds +
+                ", about='" + about + '\'' +
+                '}';
     }
 }

@@ -1,135 +1,176 @@
 package dao.database;
 
 import dao.api.IVoteDAO;
+import dao.entity.ArtistEntity;
+import dao.entity.GenreEntity;
+import dao.entity.GenreEntity_;
+import dao.entity.VoteEntity;
 import dao.factories.ConnectionSingleton;
-import dao.util.ConnectionManager;
 import dto.SavedVoteDTO;
 import dto.VoteDTO;
 
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class VoteDBDAO implements IVoteDAO {
-
-    private static final String SELECT_ALL = "SELECT id, artist_id, about, email, creation_time " +
-            "FROM app.votes;";
-    private static final String SELECT_GENRES = "SELECT vg.genre_id " +
-            "FROM app.votes AS v " +
-            "  INNER JOIN app.votes_genres AS vg " +
-            "  ON v.id = vg.vote_id " +
-            "WHERE v.id = ?;";
-    private static final String SAVE_VOTE = "INSERT INTO app.votes (" +
-            "artist_id, about, email, creation_time) " +
-            "VALUES (?, ?, ?, ?);";
-    private static final String SAVE_GENRE_VOTE = "INSERT INTO app.votes_genres (" +
-            "vote_id, genre_id) " +
-            "VALUES (?, ?);";
     @Override
     public List<SavedVoteDTO> getAll() {
-        try (Connection connection = ConnectionSingleton.getInstance().open();
-             PreparedStatement getAll = connection.prepareStatement(SELECT_ALL);
-             PreparedStatement getGenres = connection.prepareStatement(SELECT_GENRES);
-             ResultSet voteResults = getAll.executeQuery()) {
+        List<SavedVoteDTO> savedVoteDTOs;
+        List<VoteEntity> voteEntities;
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
-            List<SavedVoteDTO> votes = new ArrayList<>();
-            int id;
-            int artistID;
-            LocalDateTime time;
-            String about;
-            String email;
-            VoteDTO vote;
+            Query query = entityManager.createQuery("SELECT v FROM VoteEntity v");
+            voteEntities = query.getResultList();
 
-            while (voteResults.next()) {
-                id = getID(voteResults);
-                getGenres.setInt(1, id);
-                List<Integer> genreIDs = new ArrayList<>();
-                try (ResultSet genreResults = getGenres.executeQuery()) {
-                    while (genreResults.next()) {
-                        genreIDs.add(getGenreID(genreResults));
-                    }
-                }
-                artistID = getArtistID(voteResults);
-                time = getTime(voteResults);
-                about = getAbout(voteResults);
-                email = getEmail(voteResults);
-                vote = new VoteDTO(artistID, genreIDs, about, email);
-                votes.add(new SavedVoteDTO(vote, time));
+            savedVoteDTOs = voteEntities
+                    .stream()
+                    .map(vote -> new SavedVoteDTO(new VoteDTO(
+                            vote.getArtistId().getId(),
+                            vote.getGenreIds().stream().map(GenreEntity::getId).collect(Collectors.toList()),
+                            vote.getAbout(),
+                            vote.getEmail()
+                    ), vote.getCreationTime()))
+                    .collect(Collectors.toList());
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
-            return votes;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
+
+        return savedVoteDTOs;
     }
 
+    public List<SavedVoteDTO> getAllCriteria() {
+        List<SavedVoteDTO> savedVoteDTOs;
+        List<VoteEntity> voteEntities;
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<VoteEntity> voteQuery = cb.createQuery(VoteEntity.class);
+
+            Root<VoteEntity> from = voteQuery.from(VoteEntity.class);
+            CriteriaQuery<VoteEntity> finalVoteQuery = voteQuery.select(from);
+
+            voteEntities = entityManager.createQuery(finalVoteQuery)
+                    .getResultList();
+            savedVoteDTOs = voteEntities
+                    .stream()
+                    .map(vote -> new SavedVoteDTO(new VoteDTO(
+                            vote.getArtistId().getId(),
+                            vote.getGenreIds().stream().map(GenreEntity::getId).collect(Collectors.toList()),
+                            vote.getAbout(),
+                            vote.getEmail()
+                    ), vote.getCreationTime()))
+                    .collect(Collectors.toList());
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+
+
+
+                entityManager.close();
+            }
+        }
+
+        return savedVoteDTOs;
+    }
     @Override
     public void save(SavedVoteDTO vote) {
-        try (Connection connection = ConnectionSingleton.getInstance().open()) {
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
 
-            connection.setAutoCommit(false);
+            entityManager.getTransaction().begin();
 
-            try (PreparedStatement saveVote = connection.prepareStatement(SAVE_VOTE,
-                    Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement saveGenreVote = connection.prepareStatement(SAVE_GENRE_VOTE)) {
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class,
+                    vote.getVoteDTO().getArtistId());
 
-                VoteDTO innerVote = vote.getVoteDTO();
-                saveVote.setInt(1, innerVote.getArtistId());
-                saveVote.setString(2, innerVote.getAbout());
-                saveVote.setString(3, innerVote.getEmail());
-                saveVote.setObject(4, vote.getCreateDataTime());
-                saveVote.execute();
+            List<Long> genreIds = vote.getVoteDTO().getGenreIds();
+            Query getGenres = entityManager.createQuery("SELECT g FROM GenreEntity g WHERE id IN (:genreIds)");
+            getGenres.setParameter("genreIds", genreIds);
+            List<GenreEntity> genres = getGenres.getResultList();
 
-                List<Integer> genres = innerVote.getGenreIds();
-                int voteID;
-                try (ResultSet generatedID = saveVote.getGeneratedKeys()) {
-                    if (generatedID.next()) {
-                        voteID = generatedID.getInt(1);
-                    } else {
-                        connection.rollback();
-                        throw new IllegalArgumentException("Failed to save the vote");
-                    }
-                }
+            VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
+                    vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
+            artistEntity.getVotes().add(voteEntity);
+            genres.forEach(genre -> genre.addVote(voteEntity));
 
-                try {
-                    for (int i = 0; i < genres.size(); i++) {
-                        saveGenreVote.setInt(1, voteID);
-                        saveGenreVote.setInt(2, genres.get(i));
-                        saveGenreVote.execute();
-                    }
-                } catch (SQLException e) {
-                    connection.rollback();
-                    throw new IllegalArgumentException("Failed to save the vote");
-                }
-
-                connection.commit();
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
     }
 
-    private int getID(ResultSet resultSet) throws SQLException {
-        return resultSet.getInt("id");
-    }
+    public void saveCriteria(SavedVoteDTO vote) {
 
-    private int getGenreID(ResultSet resultSet) throws SQLException {
-        return resultSet.getInt("genre_id");
-    }
-    private int getArtistID(ResultSet resultSet) throws SQLException {
-        return resultSet.getInt("artist_id");
-    }
+        EntityManager entityManager = null;
+        List<GenreEntity> genres;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
 
-    private String getAbout(ResultSet resultSet) throws SQLException {
-        return resultSet.getString("about");
-    }
+            entityManager.getTransaction().begin();
 
-    private String getEmail(ResultSet resultSet) throws  SQLException {
-        return resultSet.getString("email");
-    }
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class,
+                    vote.getVoteDTO().getArtistId());
+            System.out.println(artistEntity.getId());
 
-    private LocalDateTime getTime(ResultSet resultSet) throws SQLException {
-        return resultSet.getObject("creation_time", LocalDateTime.class);
+            List<Long> genreIds = vote.getVoteDTO().getGenreIds();
+
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<GenreEntity> genreQuery = cb.createQuery(GenreEntity.class);
+
+            Root<GenreEntity> fromGenres = genreQuery.from(GenreEntity.class);
+            CriteriaQuery<GenreEntity> finalGenreQuery = genreQuery.select(fromGenres)
+                    .where(fromGenres.get(GenreEntity_.id).in(genreIds));
+
+            genres = entityManager.createQuery(finalGenreQuery).getResultList();
+
+            VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
+                    vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
+            artistEntity.getVotes().add(voteEntity);
+            genres.forEach(genre -> genre.addVote(voteEntity));
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 }

@@ -10,22 +10,29 @@ import service.api.IVoteService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class VoteService implements IVoteService {
 
     private final IVoteDAO voteDAO;
     private final IGenreService genreService;
     private final IArtistService artistService;
+    private final ISenderService senderService;
+    private final ExecutorService executorService;
     private static final String EMAIL_PATTERN = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*"
             + "@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     public VoteService(IVoteDAO voteDAO,
                        IGenreService genreService,
-                       IArtistService artistService
+                       IArtistService artistService,
+                       ISenderService senderService
     ) {
         this.voteDAO = voteDAO;
         this.genreService = genreService;
         this.artistService = artistService;
+        this.senderService = senderService;
+        this.executorService = Executors.newFixedThreadPool(8);
     }
 
     @Override
@@ -40,10 +47,10 @@ public class VoteService implements IVoteService {
 
     @Override
     public void validate(VoteDTO vote) {
-        int artistId = vote.getArtistId();
+        long artistId = vote.getArtistId();
         validateArtist(artistId);
 
-        List<Integer> genresIdList = vote.getGenreIds();
+        List<Long> genresIdList = vote.getGenreIds();
         validateGenres(genresIdList);
 
         String about = vote.getAbout();
@@ -53,14 +60,14 @@ public class VoteService implements IVoteService {
         validateEmail(email);
     }
 
-    private void validateArtist(int artistId) {
+    private void validateArtist(long artistId) {
         if (!artistService.exists(artistId)) {
             throw new NoSuchElementException("Invalid artist id " +
                     "provided - '" + artistId + "' ");
         }
     }
 
-    private void validateGenres(List<Integer> genresIdList) {
+    private void validateGenres(List<Long> genresIdList) {
 
         if (genresIdList.size() < 3 || genresIdList.size() > 5) {
             throw new IllegalArgumentException("Number of genres outside" +
@@ -72,7 +79,7 @@ public class VoteService implements IVoteService {
             throw new IllegalArgumentException("Genre parameter " +
                     "must be non-repeating ");
         }
-        for (int genreId : genresIdList) {
+        for (long genreId : genresIdList) {
             if (!genreService.exists(genreId)) {
                 throw new NoSuchElementException("Invalid genre id " +
                         "provided - '" + genreId + "' ");

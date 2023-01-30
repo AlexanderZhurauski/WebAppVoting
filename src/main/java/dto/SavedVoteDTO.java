@@ -24,4 +24,12 @@ public class SavedVoteDTO {
     public LocalDateTime getCreateDataTime() {
         return creationTime;
     }
+
+    @Override
+    public String toString() {
+        return "SavedVoteDTO{" +
+                "voteDTO=" + voteDTO +
+                ", creationTime=" + creationTime +
+                '}';
+    }
 }

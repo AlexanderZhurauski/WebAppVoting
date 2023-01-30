@@ -1,127 +1,150 @@
 package dao.database;
 
 import dao.api.IGenreDAO;
+import dao.entity.GenreEntity;
 import dao.factories.ConnectionSingleton;
 import dto.GenreDTO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 public class GenreDBDAO implements IGenreDAO {
-    private static final String SELECT_ALL = "SELECT id, name FROM app.genres;";
-    private static final String SELECT_BY_ID = "SELECT id, name FROM app.genres" +
-            " WHERE id = ?;";
-    private static final String ADD = "INSERT INTO app.genres (name) VALUES (?);";
-    private static final String UPDATE = "UPDATE app.genres SET name=? WHERE id=?;";
-    private static final String COUNT_VOTES = "SELECT COUNT(genre_id) AS count FROM app.votes_genres " +
-            "WHERE genre_id=?;";
-    private static final String DELETE = "DELETE FROM app.genres WHERE id=?;";
-
     @Override
     public List<GenreDTO> getAll() {
-        try (Connection connection = ConnectionSingleton.getInstance().open();
-             PreparedStatement getAll = connection.prepareStatement(SELECT_ALL,
-                     ResultSet.TYPE_SCROLL_SENSITIVE,
-                     ResultSet.CONCUR_UPDATABLE);
-             ResultSet resultSet = getAll.executeQuery()) {
-
-            List<GenreDTO> genres = new ArrayList<>();
-            while (resultSet.next()) {
-                genres.add(new GenreDTO(getID(resultSet), getName(resultSet)));
+        EntityManager entityManager = null;
+        List<GenreDTO> list;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+            list = entityManager.createQuery("from GenreEntity ", GenreEntity.class)
+                    .getResultStream()
+                    .map(GenreDTO::new)
+                    .toList();
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
-            return genres;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
+        return list;
     }
 
     @Override
-    public boolean exists(int id) {
-        try (Connection connection = ConnectionSingleton.getInstance().open();
-             PreparedStatement exists = connection.prepareStatement(SELECT_BY_ID)) {
-            exists.setInt(1, id);
-
-            try (ResultSet resultSet = exists.executeQuery()) {
-                return resultSet.next();
+    public boolean exists(long id) {
+        boolean bool = false;
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+            if (entityManager.find(GenreEntity.class, id) != null) {
+                bool = true;
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
+
+        return bool;
     }
 
     @Override
-    public GenreDTO get(int id) {
-        try (Connection connection = ConnectionSingleton.getInstance().open();
-             PreparedStatement exists = connection.prepareStatement(SELECT_BY_ID)) {
-            exists.setInt(1, id);
+    public GenreDTO get(long id) {
+        EntityManager entityManager = null;
+        GenreDTO genreDTO;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
-            try (ResultSet resultSet = exists.executeQuery()) {
-                if (resultSet.next()) {
-                    return new GenreDTO(getID(resultSet), getName(resultSet));
-                } else {
-                    throw new IllegalArgumentException(String
-                            .format("No genre with id %d was found!", id));
-                }
+            genreDTO = new GenreDTO(entityManager.find(GenreEntity.class, id));
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
+
+        return genreDTO;
     }
 
+    @Override
     public void add(String genre) {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement statement = conn.prepareStatement(ADD)) {
-            statement.setString(1, genre);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void update(int id, String genre) {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement statement = conn.prepareStatement(UPDATE)) {
-            statement.setString(1, genre);
-            statement.setInt(2, id);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void delete(int id) {
-        try (Connection conn = ConnectionSingleton.getInstance().open();
-             PreparedStatement statement = conn.prepareStatement(COUNT_VOTES,
-                     ResultSet.TYPE_SCROLL_SENSITIVE,
-                     ResultSet.CONCUR_UPDATABLE)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.first();
-                if (resultSet.getInt("count") == 0) {
-                    try (PreparedStatement delStatement = conn.prepareStatement(DELETE)) {
-                        delStatement.setInt(1, id);
-                        delStatement.executeUpdate();
-                    }
-                } else {
-                    throw new IllegalArgumentException("genre can't be deleted: it has votes");
-                }
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.persist(new GenreEntity(genre));
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
     }
 
-    private int getID(ResultSet resultSet) throws SQLException {
-        return resultSet.getInt("id");
+    @Override
+    public void update(long id, String genre) {
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
+            genreEntity.setGenre(genre);
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 
-    private String getName(ResultSet resultSet) throws SQLException {
-        return resultSet.getString("name");
+    @Override
+    public void delete(long id) {
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
+            entityManager.remove(genreEntity);
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 }

@@ -9,9 +9,9 @@ import java.util.Map;
 
 public interface IStatisticsService {
 
-    Map<ArtistDTO, Integer> getBestArtists();
+    Map<ArtistDTO, Long> getBestArtists();
 
-    Map<GenreDTO, Integer> getBestGenres();
+    Map<GenreDTO, Long> getBestGenres();
 
     Map<LocalDateTime, String> getAbouts();
 

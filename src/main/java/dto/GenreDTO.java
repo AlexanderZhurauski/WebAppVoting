@@ -1,10 +1,12 @@
 package dto;
 
+import dao.entity.GenreEntity;
+
 import java.util.Objects;
 
 public class GenreDTO {
 
-    private final int id;
+    private final long id;
     private final String genre;
 
     public GenreDTO(int id, String genre) {
@@ -12,7 +14,12 @@ public class GenreDTO {
         this.genre = genre;
     }
 
-    public int getId() {
+    public GenreDTO(GenreEntity entity) {
+        this.id = entity.getId().intValue();
+        this.genre = entity.getGenre();
+    }
+
+    public long getId() {
         return id;
     }
 

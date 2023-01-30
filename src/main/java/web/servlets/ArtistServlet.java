@@ -59,7 +59,7 @@ public class ArtistServlet extends ExtendedHttpServlet {
 
         String id = RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.ID_PARAM_NAME);
-        int artistId = RequestParamHandler.getID(id);
+        long artistId = RequestParamHandler.getID(id);
         String artist = RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.ARTIST_PARAM_NAME);
         service.update(artistId, artist);
@@ -77,7 +77,7 @@ public class ArtistServlet extends ExtendedHttpServlet {
 
         String id = RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.ID_PARAM_NAME);
-        int artistId = RequestParamHandler.getID(id);
+        long artistId = RequestParamHandler.getID(id);
         service.delete(artistId);
 
         PrintWriter writer = resp.getWriter();
