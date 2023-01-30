@@ -12,62 +12,156 @@ public class ArtistDBDao implements IArtistDAO {
 
     @Override
     public List<ArtistDTO> getAll() {
+        EntityManager entityManager = null;
         List<ArtistDTO> list;
-        EntityManager entityManager = ConnectionSingleton.getInstance().open();
-        entityManager.getTransaction().begin();
-        list = entityManager.createQuery("from ArtistEntity ", ArtistEntity.class)
-                .getResultStream()
-                .map(ArtistDTO::new)
-                .toList();
-        entityManager.getTransaction().commit();
+
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+
+            list = entityManager.createQuery("from ArtistEntity ", ArtistEntity.class)
+                    .getResultStream()
+                    .map(ArtistDTO::new)
+                    .toList();
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+
         return list;
     }
 
     @Override
     public boolean exists(long id) {
+        EntityManager entityManager = null;
         boolean bool = false;
-        EntityManager entityManager = ConnectionSingleton.getInstance().open();
-        entityManager.getTransaction().begin();
-        if (entityManager.find(ArtistEntity.class, id) != null) {
-            bool = true;
+
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+
+            if (entityManager.find(ArtistEntity.class, id) != null) {
+                bool = true;
+            }
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
         }
-        entityManager.getTransaction().commit();
         return bool;
     }
 
     @Override
     public ArtistDTO get(long id) {
-        EntityManager entityManager = ConnectionSingleton.getInstance().open();
-        entityManager.getTransaction().begin();
-        ArtistDTO artistDTO = entityManager.find(ArtistDTO.class, id);
-        entityManager.getTransaction().commit();
+        EntityManager entityManager = null;
+        ArtistDTO artistDTO;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+            entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
+
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
+            artistDTO = new ArtistDTO(artistEntity);
+
+            entityManager.getTransaction().commit();
+
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+
         return artistDTO;
     }
 
     @Override
     public void add(String artist) {
-        EntityManager entityManager = ConnectionSingleton.getInstance().open();
-        entityManager.getTransaction().begin();
-        entityManager.persist(new ArtistEntity(artist));
-        entityManager.getTransaction().commit();
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+
+            entityManager.persist(new ArtistEntity(artist));
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 
     @Override
     public void update(long id, String artist) {
-        EntityManager entityManager = ConnectionSingleton.getInstance().open();
-        entityManager.getTransaction().begin();
-        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
-        artistEntity.setArtist(artist);
-        entityManager.getTransaction().commit();
+        EntityManager entityManager = null;
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
+            artistEntity.setArtist(artist);
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 
     @Override
     public void delete(long id) {
-        EntityManager entityManager = ConnectionSingleton.getInstance().open();
-        entityManager.getTransaction().begin();
-        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
-        entityManager.remove(artistEntity);
-        entityManager.getTransaction().commit();
+        EntityManager entityManager = null;
 
+        try {
+            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager.getTransaction().begin();
+
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
+            entityManager.remove(artistEntity);
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
     }
 }
