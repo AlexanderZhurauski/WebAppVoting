@@ -1,8 +1,6 @@
 package dao.entity;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 
@@ -15,12 +13,6 @@ public class GenreEntity {
     private Long id;
     @Column(name = "name")
     private String genre;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "votes_genres", schema = "app",
-            joinColumns = @JoinColumn(name = "genre_id"),
-            inverseJoinColumns = @JoinColumn(name = "vote_id"))
-    private List<VoteEntity> votes = new ArrayList<>();
     public GenreEntity() {
     }
 
@@ -47,19 +39,6 @@ public class GenreEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public List<VoteEntity> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(List<VoteEntity> votes) {
-        this.votes = votes;
-    }
-
-    public void addVote(VoteEntity vote) {
-        votes.add(vote);
-        vote.getGenreIds().add(this);
     }
 
     @Override

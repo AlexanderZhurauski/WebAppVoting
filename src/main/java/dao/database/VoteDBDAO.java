@@ -116,8 +116,7 @@ public class VoteDBDAO implements IVoteDAO {
 
             VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
                     vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
-            artistEntity.getVotes().add(voteEntity);
-            genres.forEach(genre -> genre.addVote(voteEntity));
+            entityManager.persist(voteEntity);
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {
@@ -158,8 +157,7 @@ public class VoteDBDAO implements IVoteDAO {
 
             VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
                     vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
-            artistEntity.getVotes().add(voteEntity);
-            genres.forEach(genre -> genre.addVote(voteEntity));
+            entityManager.persist(voteEntity);
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {

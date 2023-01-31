@@ -13,10 +13,13 @@ public class VoteEntity {
     @GeneratedValue(generator = "votes_seq",strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "votes_seq",sequenceName = "votes_id_seq",schema = "app",allocationSize = 1)
     private Long id;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "artist_id")
     private ArtistEntity artistId;
-    @ManyToMany(mappedBy = "votes")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "votes_genres", schema = "app",
+            joinColumns = @JoinColumn(name = "genre_id"),
+            inverseJoinColumns = @JoinColumn(name = "vote_id"))
     private List<GenreEntity> genreIds = new ArrayList<>();
     private String about;
     @Column(name = "creation_time")

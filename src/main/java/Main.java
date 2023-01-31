@@ -38,14 +38,7 @@ public class Main {
         GenreDTO genreDTO = genreDAO.get(1);
         System.out.println(genreDTO.getGenre());
 
-        genreDAO.add("NewGenreLol");
-
         List<GenreDTO> genres = genreDAO.getAll();
-        genres.stream().map(GenreDTO::getGenre).forEach(System.out::println);
-
-        genreDAO.delete(11);
-
-        genres = genreDAO.getAll();
         genres.stream().map(GenreDTO::getGenre).forEach(System.out::println);
      }
 }
