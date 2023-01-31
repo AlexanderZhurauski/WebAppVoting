@@ -115,7 +115,7 @@ public class VoteDBDAO implements IVoteDAO {
             List<GenreEntity> genres = getGenres.getResultList();
 
             VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
-                    vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
+                    genres, vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
             entityManager.persist(voteEntity);
 
             entityManager.getTransaction().commit();
@@ -156,7 +156,7 @@ public class VoteDBDAO implements IVoteDAO {
             genres = entityManager.createQuery(finalGenreQuery).getResultList();
 
             VoteEntity voteEntity = new VoteEntity(artistEntity, vote.getVoteDTO().getAbout(),
-                    vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
+                    genres, vote.getCreateDataTime(), vote.getVoteDTO().getEmail());
             entityManager.persist(voteEntity);
 
             entityManager.getTransaction().commit();

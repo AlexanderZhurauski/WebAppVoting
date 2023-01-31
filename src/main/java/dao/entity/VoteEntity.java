@@ -27,8 +27,10 @@ public class VoteEntity {
     private String email;
 
     public VoteEntity(ArtistEntity artistEntity, String about,
+                      List<GenreEntity> genreIds,
                       LocalDateTime creationTime, String email) {
         this.artistId = artistEntity;
+        this.genreIds = genreIds;
         this.about = about;
         this.creationTime = creationTime;
         this.email = email;
