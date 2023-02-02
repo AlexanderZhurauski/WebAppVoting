@@ -2,9 +2,7 @@ package web.servlets;
 
 import dto.SavedVoteDTO;
 import dto.VoteDTO;
-import service.api.ISenderService;
 import service.api.IVoteService;
-import service.factories.SenderServiceSingleton;
 import service.factories.VoteServiceSingleton;
 import web.util.RequestParamHandler;
 
@@ -20,13 +18,11 @@ import java.util.List;
 public class VoteServlet extends HttpServlet {
 
     private final IVoteService voteService;
-    private final ISenderService senderService;
     private static final String CHARACTER_ENCODING = "UTF-8";
     private static final String CONTENT_TYPE = "text/html; charset=UTF-8";
 
     public VoteServlet() {
         this.voteService = VoteServiceSingleton.getInstance();
-        this.senderService = SenderServiceSingleton.getInstance();
     }
 
     @Override
@@ -51,7 +47,6 @@ public class VoteServlet extends HttpServlet {
 
         SavedVoteDTO savedVote = new SavedVoteDTO(vote);
         voteService.save(savedVote);
-        senderService.sendVoteConfirmation(savedVote);
 
         String contextPath = req.getContextPath();
         resp.sendRedirect(contextPath + "/results");

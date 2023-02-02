@@ -33,3 +33,15 @@ CREATE TABLE IF NOT EXISTS app.votes_genres(
     CONSTRAINT unique_vote UNIQUE(vote_id, genre_id)
 );
 
+CREATE TABLE IF NOT EXISTS app.emails
+(
+    id bigserial,
+    recipient text NOT NULL,
+    topic text NOT NULL,
+    "textMessage" text NOT NULL,
+    departures integer NOT NULL DEFAULT 1,
+    status text NOT NULL,
+    CONSTRAINT pk_email_id PRIMARY KEY (id),
+    CONSTRAINT email FOREIGN KEY (recipient)
+        REFERENCES app.votes (email)
+);

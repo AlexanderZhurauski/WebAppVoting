@@ -2,11 +2,14 @@ package dao.database;
 
 import dao.api.IVoteDAO;
 import dao.factories.ConnectionSingleton;
-import dao.util.ConnectionManager;
 import dto.SavedVoteDTO;
 import dto.VoteDTO;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,7 @@ public class VoteDBDAO implements IVoteDAO {
     private static final String SAVE_GENRE_VOTE = "INSERT INTO app.votes_genres (" +
             "vote_id, genre_id) " +
             "VALUES (?, ?);";
+
     @Override
     public List<SavedVoteDTO> getAll() {
         try (Connection connection = ConnectionSingleton.getInstance().open();
@@ -92,9 +96,9 @@ public class VoteDBDAO implements IVoteDAO {
                 }
 
                 try {
-                    for (int i = 0; i < genres.size(); i++) {
+                    for (Integer genre : genres) {
                         saveGenreVote.setInt(1, voteID);
-                        saveGenreVote.setInt(2, genres.get(i));
+                        saveGenreVote.setInt(2, genre);
                         saveGenreVote.execute();
                     }
                 } catch (SQLException e) {
@@ -117,6 +121,7 @@ public class VoteDBDAO implements IVoteDAO {
     private int getGenreID(ResultSet resultSet) throws SQLException {
         return resultSet.getInt("genre_id");
     }
+
     private int getArtistID(ResultSet resultSet) throws SQLException {
         return resultSet.getInt("artist_id");
     }
@@ -125,7 +130,7 @@ public class VoteDBDAO implements IVoteDAO {
         return resultSet.getString("about");
     }
 
-    private String getEmail(ResultSet resultSet) throws  SQLException {
+    private String getEmail(ResultSet resultSet) throws SQLException {
         return resultSet.getString("email");
     }
 
