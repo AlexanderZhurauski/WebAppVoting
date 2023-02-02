@@ -1,9 +1,7 @@
 package dao.entity;
 
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -15,9 +13,6 @@ public class ArtistEntity {
     private Long id;
     @Column(name = "name")
     private String artist;
-
-    //@OneToMany(mappedBy = "artist_id")
-    //public List<VoteEntity> votes;
 
     public ArtistEntity() {
     }
