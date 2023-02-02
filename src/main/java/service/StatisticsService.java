@@ -43,7 +43,7 @@ public class StatisticsService implements IStatisticsService {
                 .map(VoteDTO::getArtistId)
                 .forEach(artistId -> artistVotes.put(
                         artistId,
-                        artistVotes.get(artistId) + 1));
+                        artistVotes.get(artistId) + 1L));
         return sortArtistsByVotes(artistVotes);
     }
 
@@ -70,7 +70,7 @@ public class StatisticsService implements IStatisticsService {
                 .flatMap(Collection::stream)
                 .forEach(genreId -> genreVotes.put(
                         genreId,
-                        genreVotes.get(genreId) + 1));
+                        genreVotes.get(genreId) + 1L));
         return sortGenresByVotes(genreVotes);
     }
 

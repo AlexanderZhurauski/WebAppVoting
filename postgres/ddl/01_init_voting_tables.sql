@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS app.votes(
 
 CREATE TABLE IF NOT EXISTS app.votes_genres(
     vote_id BIGINT NOT NULL,
-    genre_id INT NOT NULL,
+    genre_id BIGINT NOT NULL,
     CONSTRAINT fk_vote_id FOREIGN KEY (vote_id)
     REFERENCES app.votes (id),
     CONSTRAINT fk_genre_id FOREIGN KEY (genre_id)
