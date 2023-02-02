@@ -7,6 +7,7 @@ import dto.GenreDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GenreDBDAO implements IGenreDAO {
     @Override
@@ -17,10 +18,10 @@ public class GenreDBDAO implements IGenreDAO {
             entityManager = ConnectionSingleton.getInstance().open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
-            list = entityManager.createQuery("from GenreEntity ", GenreEntity.class)
+            list = entityManager.createQuery("SELECT g FROM GenreEntity g", GenreEntity.class)
                     .getResultStream()
                     .map(GenreDTO::new)
-                    .toList();
+                    .collect(Collectors.toList());
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {

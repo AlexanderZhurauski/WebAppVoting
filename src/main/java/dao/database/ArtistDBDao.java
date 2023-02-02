@@ -7,6 +7,7 @@ import dto.ArtistDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArtistDBDao implements IArtistDAO {
 
@@ -20,10 +21,10 @@ public class ArtistDBDao implements IArtistDAO {
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
-            list = entityManager.createQuery("from ArtistEntity ", ArtistEntity.class)
+            list = entityManager.createQuery("SELECT a FROM ArtistEntity a", ArtistEntity.class)
                     .getResultStream()
                     .map(ArtistDTO::new)
-                    .toList();
+                    .collect(Collectors.toList());
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {
