@@ -6,20 +6,20 @@ import java.util.Objects;
 
 public class GenreDTO {
 
-    private final int id;
+    private final Long id;
     private final String genre;
 
-    public GenreDTO(int id, String genre) {
+    public GenreDTO(Long id, String genre) {
         this.id = id;
         this.genre = genre;
     }
 
     public GenreDTO(GenreEntity entity) {
-        this.id = entity.getId().intValue();
+        this.id = entity.getId();
         this.genre = entity.getGenre();
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 

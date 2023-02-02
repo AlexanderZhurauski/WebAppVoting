@@ -1,27 +1,35 @@
 package dao.entity;
+
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
+
 @Entity
-@Table (name = "artist", schema = "app")
+@Table(name = "artist", schema = "app")
 public class ArtistEntity {
     @Id
-    @GeneratedValue(generator = "artist_seq",strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name ="artist_seq",sequenceName = "artist_id_seq",schema = "app",allocationSize = 1)
+    @GeneratedValue(generator = "artist_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "artist_seq", sequenceName = "artist_id_seq", schema = "app", allocationSize = 1)
     private Long id;
     @Column(name = "name")
     private String artist;
 
-    public ArtistEntity(){
+    //@OneToMany(mappedBy = "artist_id")
+    //public List<VoteEntity> votes;
+
+    public ArtistEntity() {
     }
-    public ArtistEntity(String artist){
-        this.artist=artist;
+
+    public ArtistEntity(String artist) {
+        this.artist = artist;
     }
 
     public Long getId() {
         return id;
     }
+
 
     public String getArtist() {
         return artist;

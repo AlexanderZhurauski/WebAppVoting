@@ -1,5 +1,7 @@
 package dto;
 
+import dao.entity.VoteEntity;
+
 import java.time.LocalDateTime;
 
 public class SavedVoteDTO {
@@ -17,6 +19,10 @@ public class SavedVoteDTO {
         creationTime = LocalDateTime.now();
     }
 
+    public SavedVoteDTO(VoteEntity entity){
+        this.voteDTO=new VoteDTO(entity);
+        this.creationTime=entity.getCreation_time();
+    }
     public VoteDTO getVoteDTO() {
         return voteDTO;
     }

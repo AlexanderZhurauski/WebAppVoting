@@ -1,27 +1,37 @@
 package dto;
 
+import dao.entity.GenreEntity;
+import dao.entity.VoteEntity;
+
 import java.util.Collections;
 import java.util.List;
 
 public class VoteDTO {
 
     private final String email;
-    private final int artistId;
-    private final List<Integer> genreIds;
+    private final Long artistId;
+    private final List<Long> genreIds;
     private final String about;
 
-    public VoteDTO(int artistId, List<Integer> genreIds, String about, String email) {
+    public VoteDTO(Long artistId, List<Long> genreIds, String about, String email) {
         this.artistId = artistId;
         this.genreIds = genreIds;
         this.about = about;
         this.email = email;
     }
 
-    public int getArtistId() {
+    public VoteDTO(VoteEntity vote) {
+        this.email = vote.getEmail();
+        this.about = vote.getAbout();
+        this.artistId = vote.getArtistEntity().getId();
+        this.genreIds = vote.getGenreEntities().stream().map(GenreEntity::getId).toList();
+    }
+
+    public Long getArtistId() {
         return artistId;
     }
 
-    public List<Integer> getGenreIds() {
+    public List<Long> getGenreIds() {
         return Collections.unmodifiableList(genreIds);
     }
 

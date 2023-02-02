@@ -13,10 +13,11 @@
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://142.93.228.132:5432/voting"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
-            <property name="javax.persistence.jdbc.password" value="somePassword"/>
+            <property name="javax.persistence.jdbc.password" value="Password"/>
 
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.hbm2ddl.auto" value="none"/>
+
         </properties>
 
     </persistence-unit>

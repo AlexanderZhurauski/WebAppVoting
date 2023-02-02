@@ -20,12 +20,12 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public GenreDTO get(int id) {
+    public GenreDTO get(Long id) {
         return dataSource.get(id);
     }
 
     @Override
-    public boolean exists(int id) {
+    public boolean exists(Long id) {
         return dataSource.exists(id);
     }
 
@@ -41,7 +41,7 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public void update(int id, String genre) {
+    public void update(Long id, String genre) {
         boolean isDuplicate = isDuplicate(genre);
         if (dataSource.exists(id) && !isDuplicate) {
             dataSource.update(id, genre);
@@ -52,7 +52,7 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         if (dataSource.exists(id)) {
             dataSource.delete(id);
         } else {

@@ -59,7 +59,7 @@ public class GenreServlet extends ExtendedHttpServlet {
 
         String id =RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.ID_PARAM_NAME);
-        int genreId = RequestParamHandler.getID(id);
+        Long genreId = RequestParamHandler.getID(id);
         String genre = RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.GENRE_PARAM_NAME);
         service.update(genreId, genre);
@@ -77,7 +77,7 @@ public class GenreServlet extends ExtendedHttpServlet {
 
         String id =RequestParamHandler.getRequestParam(req,
                 RequestParamHandler.ID_PARAM_NAME);
-        int genreId = RequestParamHandler.getID(id);
+        Long genreId = RequestParamHandler.getID(id);
         service.delete(genreId);
 
         PrintWriter writer = resp.getWriter();

@@ -131,7 +131,7 @@ public class SenderService implements ISenderService {
     private String getFormattedGenreNames(VoteDTO voteDTO) {
         StringBuilder message = new StringBuilder();
         message.append("Your genre vote:\n");
-        List<Integer> genreIDs = voteDTO.getGenreIds();
+        List<Long> genreIDs = voteDTO.getGenreIds();
         for (int i = 0; i < genreIDs.size(); i++) {
             message.append(i + 1)
                     .append(". ")
@@ -144,7 +144,7 @@ public class SenderService implements ISenderService {
     private String getFormattedArtistName(VoteDTO voteDTO) {
         StringBuilder message = new StringBuilder();
         message.append("Your artist vote:\n");
-        int artistID = voteDTO.getArtistId();
+        Long artistID = voteDTO.getArtistId();
         message.append("1. ")
                 .append(this.artistService.get(artistID).getArtist())
                 .append("\n");

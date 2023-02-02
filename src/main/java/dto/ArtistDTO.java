@@ -6,20 +6,20 @@ import java.util.Objects;
 
 public class ArtistDTO {
 
-    private final int id;
+    private final Long id;
     private final String artist;
 
-    public ArtistDTO(int id, String artist) {
+    public ArtistDTO(Long id, String artist) {
         this.id = id;
         this.artist = artist;
     }
 
     public ArtistDTO(ArtistEntity entity) {
-        this.id = entity.getId().intValue();
+        this.id = entity.getId();
         this.artist = entity.getArtist();
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 

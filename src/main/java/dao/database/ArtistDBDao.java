@@ -6,7 +6,6 @@ import dao.factories.ConnectionSingleton;
 import dto.ArtistDTO;
 
 import javax.persistence.EntityManager;
-import javax.persistence.RollbackException;
 import java.util.List;
 
 public class ArtistDBDao implements IArtistDAO {
@@ -21,29 +20,30 @@ public class ArtistDBDao implements IArtistDAO {
                 .map(ArtistDTO::new)
                 .toList();
         entityManager.getTransaction().commit();
+        entityManager.close();
         return list;
     }
 
     @Override
-    public boolean exists(int id) {
-        Long l = (long) id;
+    public boolean exists(Long id) {
         boolean bool = false;
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        if (entityManager.find(ArtistEntity.class, l) != null) {
+        if (entityManager.find(ArtistEntity.class, id) != null) {
             bool = true;
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
         return bool;
     }
 
     @Override
-    public ArtistDTO get(int id) {
-        Long l = (long) id;
+    public ArtistDTO get(Long id) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        ArtistDTO artistDTO = entityManager.find(ArtistDTO.class, l);
+        ArtistDTO artistDTO = entityManager.find(ArtistDTO.class, id);
         entityManager.getTransaction().commit();
+        entityManager.close();
         return artistDTO;
     }
 
@@ -53,26 +53,26 @@ public class ArtistDBDao implements IArtistDAO {
         entityManager.getTransaction().begin();
         entityManager.persist(new ArtistEntity(artist));
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     @Override
-    public void update(int id, String artist) {
-        Long l = (long) id;
+    public void update(Long id, String artist) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, l);
+        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
         artistEntity.setArtist(artist);
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     @Override
-    public void delete(int id) {
-        Long l = (long) id;
+    public void delete(Long id) {
         EntityManager entityManager = ConnectionSingleton.getInstance().open();
         entityManager.getTransaction().begin();
-        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, l);
+        ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
         entityManager.remove(artistEntity);
         entityManager.getTransaction().commit();
-
+        entityManager.close();
     }
 }

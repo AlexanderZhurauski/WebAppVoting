@@ -9,20 +9,18 @@ import javax.persistence.Persistence;
 
 public class ConnectionManager implements IConnection {
 
-    EntityManager entityManager;
-
+    EntityManagerFactory factory;
     public ConnectionManager() {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("voting");
-        entityManager = factory.createEntityManager();
+        factory = Persistence.createEntityManagerFactory("voting");
     }
 
     @Override
     public EntityManager open() {
-        return entityManager;
+        return factory.createEntityManager();
     }
 
     @Override
     public void close() {
-
+        factory.close();
     }
 }

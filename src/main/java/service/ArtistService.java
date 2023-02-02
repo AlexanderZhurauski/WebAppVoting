@@ -20,12 +20,12 @@ public class ArtistService implements IArtistService {
     }
 
     @Override
-    public boolean exists(int id) {
+    public boolean exists(Long id) {
         return dataSource.exists(id);
     }
 
     @Override
-    public ArtistDTO get(int id) {
+    public ArtistDTO get(Long id) {
         return dataSource.get(id);
     }
 
@@ -35,7 +35,7 @@ public class ArtistService implements IArtistService {
     }
 
     @Override
-    public void update(int id, String artist) {
+    public void update(Long id, String artist) {
         if (dataSource.exists(id)) {
             dataSource.update(id, artist);
         } else {
@@ -44,7 +44,7 @@ public class ArtistService implements IArtistService {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         if (dataSource.exists(id)) {
             dataSource.delete(id);
         } else {
