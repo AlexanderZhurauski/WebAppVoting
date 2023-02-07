@@ -10,8 +10,8 @@ import java.util.Objects;
 @Table(name = "votes", schema = "app")
 public class VoteEntity {
     @Id
-    @GeneratedValue(generator = "votes_seq",strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "votes_seq",sequenceName = "votes_id_seq",schema = "app",allocationSize = 1)
+    @GeneratedValue(generator = "votes_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "votes_seq", sequenceName = "votes_id_seq", schema = "app", allocationSize = 1)
     private Long id;
     @ManyToOne
     @JoinColumn(name = "artist_id")

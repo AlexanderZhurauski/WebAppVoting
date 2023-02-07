@@ -58,9 +58,6 @@ public class VoteDBDAO implements IVoteDAO {
             throw e;
         } finally {
             if (entityManager != null) {
-
-
-
                 entityManager.close();
             }
         }
@@ -79,7 +76,6 @@ public class VoteDBDAO implements IVoteDAO {
 
             ArtistEntity artistEntity = entityManager.find(ArtistEntity.class,
                     vote.getVoteDTO().getArtistId());
-            System.out.println(artistEntity.getId());
 
             List<Long> genreIds = vote.getVoteDTO().getGenreIds();
 
