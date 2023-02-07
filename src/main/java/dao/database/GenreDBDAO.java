@@ -2,7 +2,7 @@ package dao.database;
 
 import dao.api.IGenreDAO;
 import dao.entity.GenreEntity;
-import dao.factories.ConnectionSingleton;
+import dao.util.ConnectionManager;
 import dto.GenreDTO;
 
 import javax.persistence.EntityManager;
@@ -10,12 +10,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GenreDBDAO implements IGenreDAO {
+
+    private ConnectionManager connectionManager;
+
+    public GenreDBDAO(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
     @Override
     public List<GenreDTO> getAll() {
         EntityManager entityManager = null;
         List<GenreDTO> list;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
             list = entityManager.createQuery("SELECT g FROM GenreEntity g", GenreEntity.class)
@@ -41,7 +47,7 @@ public class GenreDBDAO implements IGenreDAO {
         boolean bool = false;
         EntityManager entityManager = null;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
             if (entityManager.find(GenreEntity.class, id) != null) {
@@ -67,7 +73,7 @@ public class GenreDBDAO implements IGenreDAO {
         EntityManager entityManager = null;
         GenreDTO genreDTO;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
@@ -91,7 +97,7 @@ public class GenreDBDAO implements IGenreDAO {
     public void add(String genre) {
         EntityManager entityManager = null;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.persist(new GenreEntity(genre));
             entityManager.getTransaction().commit();
@@ -111,7 +117,7 @@ public class GenreDBDAO implements IGenreDAO {
     public void update(long id, String genre) {
         EntityManager entityManager = null;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
             genreEntity.setGenre(genre);
@@ -132,7 +138,7 @@ public class GenreDBDAO implements IGenreDAO {
     public void delete(long id) {
         EntityManager entityManager = null;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
             entityManager.remove(genreEntity);

@@ -5,7 +5,7 @@ import dao.entity.ArtistEntity;
 import dao.entity.GenreEntity;
 import dao.entity.GenreEntity_;
 import dao.entity.VoteEntity;
-import dao.factories.ConnectionSingleton;
+import dao.util.ConnectionManager;
 import dto.SavedVoteDTO;
 import dto.VoteDTO;
 
@@ -17,13 +17,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class VoteDBDAO implements IVoteDAO {
+
+    private ConnectionManager connectionManager;
+
+    public VoteDBDAO(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
     @Override
     public List<SavedVoteDTO> getAll() {
         List<SavedVoteDTO> savedVoteDTOs;
         List<VoteEntity> voteEntities;
         EntityManager entityManager = null;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
@@ -67,7 +73,7 @@ public class VoteDBDAO implements IVoteDAO {
         EntityManager entityManager = null;
         List<GenreEntity> genres;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
 
             entityManager.getTransaction().begin();
 

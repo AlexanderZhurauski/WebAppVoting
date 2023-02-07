@@ -2,14 +2,20 @@ package dao.database;
 
 import dao.api.IArtistDAO;
 import dao.entity.ArtistEntity;
-import dao.factories.ConnectionSingleton;
+import dao.util.ConnectionManager;
 import dto.ArtistDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArtistDBDao implements IArtistDAO {
+public class ArtistDBDAO implements IArtistDAO {
+
+    private ConnectionManager connectionManager;
+
+    public ArtistDBDAO(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
 
     @Override
     public List<ArtistDTO> getAll() {
@@ -17,7 +23,7 @@ public class ArtistDBDao implements IArtistDAO {
         List<ArtistDTO> list;
 
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
@@ -47,7 +53,7 @@ public class ArtistDBDao implements IArtistDAO {
         boolean bool = false;
 
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
@@ -74,7 +80,7 @@ public class ArtistDBDao implements IArtistDAO {
         EntityManager entityManager = null;
         ArtistDTO artistDTO;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
@@ -101,7 +107,7 @@ public class ArtistDBDao implements IArtistDAO {
     public void add(String artist) {
         EntityManager entityManager = null;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
 
             entityManager.persist(new ArtistEntity(artist));
@@ -123,7 +129,7 @@ public class ArtistDBDao implements IArtistDAO {
     public void update(long id, String artist) {
         EntityManager entityManager = null;
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
 
             ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
@@ -147,7 +153,7 @@ public class ArtistDBDao implements IArtistDAO {
         EntityManager entityManager = null;
 
         try {
-            entityManager = ConnectionSingleton.getInstance().open();
+            entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
 
             ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
