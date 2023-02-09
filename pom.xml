@@ -38,13 +38,7 @@
 
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>5.3.25</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
+      <artifactId>spring-webmvc</artifactId>
       <version>5.3.25</version>
     </dependency>
 
@@ -131,7 +125,7 @@
               </resource>
             </webResources>
             <warName>voting</warName>
-            <webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
+            <webXml>src/main/resources/WEB-INF/web.xml</webXml>
           </configuration>
         </plugin>
 

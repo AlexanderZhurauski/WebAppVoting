@@ -40,7 +40,7 @@ public class Main {
 
         System.out.println("----------------");
         voteService.save(new SavedVoteDTO(new VoteDTO(1,
-                List.of(2L, 3L, 4L), "Bruh", "gandajlfdude@gmail.com")));
+                List.of(2L, 3L, 4L), "new message", "gandajlfdude@gmail.com")));
         System.out.println("All votes:");
         voteService
                 .getAll()
@@ -52,5 +52,27 @@ public class Main {
                     voteText += vote.getVoteDTO().getEmail();
                     System.out.println(voteText);
                 });
+
+        statisticsService
+                .getAbouts()
+                .values()
+                .forEach(System.out::println);
+        System.out.println("----------------");
+
+        statisticsService
+                .getBestArtists()
+                .entrySet()
+                .forEach(key -> System.out.println(
+                        key.getKey().getArtist() + ": " + key.getValue()));
+        System.out.println("----------------");
+
+        statisticsService
+                .getBestGenres()
+                .entrySet()
+                .forEach(key -> System.out.println(
+                        key.getKey().getGenre() + ": " + key.getValue()));
+        System.out.println("----------------");
+
+        senderService.sendVerificationLink("gandalfdude@gmail.com", "gwtgqetq");
     }
 }
