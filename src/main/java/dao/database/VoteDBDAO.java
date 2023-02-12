@@ -78,6 +78,7 @@ public class VoteDBDAO implements IVoteDAO {
                     vote.getVoteDTO().getArtistId());
 
             List<Long> genreIds = vote.getVoteDTO().getGenreIds();
+            System.out.println(genreIds);
 
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<GenreEntity> genreQuery = cb.createQuery(GenreEntity.class);

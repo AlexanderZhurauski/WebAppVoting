@@ -71,8 +71,5 @@ public class Main {
                 .entrySet()
                 .forEach(key -> System.out.println(
                         key.getKey().getGenre() + ": " + key.getValue()));
-        System.out.println("----------------");
-
-        senderService.sendVerificationLink("gandalfdude@gmail.com", "gwtgqetq");
     }
 }

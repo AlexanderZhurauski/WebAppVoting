@@ -18,8 +18,8 @@ public class VoteEntity {
     private ArtistEntity artistId;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "votes_genres", schema = "app",
-            joinColumns = @JoinColumn(name = "genre_id"),
-            inverseJoinColumns = @JoinColumn(name = "vote_id"))
+            joinColumns = @JoinColumn(name = "vote_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<GenreEntity> genreIds = new ArrayList<>();
     private String about;
     @Column(name = "creation_time")
