@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class ArtistDBDAO implements IArtistDAO {
 
-    private ConnectionManager connectionManager;
+    private final ConnectionManager connectionManager;
 
     public ArtistDBDAO(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;

@@ -12,7 +12,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        ApplicationContext xmlContext = new ClassPathXmlApplicationContext("service.xml");
+        ApplicationContext xmlContext = new ClassPathXmlApplicationContext("WEB-INF/service.xml");
 
         IArtistService artistService = xmlContext.getBean("ArtistService",
                 ArtistService.class);
@@ -40,7 +40,7 @@ public class Main {
 
         System.out.println("----------------");
         voteService.save(new SavedVoteDTO(new VoteDTO(1,
-                List.of(2L, 3L, 4L), "new message", "gandajlfdude@gmail.com")));
+                List.of(2L, 3L, 4L), "new message", "gandabbjlfdude@gmail.com")));
         System.out.println("All votes:");
         voteService
                 .getAll()

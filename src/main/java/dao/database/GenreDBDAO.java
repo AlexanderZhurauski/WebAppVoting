@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class GenreDBDAO implements IGenreDAO {
 
-    private ConnectionManager connectionManager;
+    private final ConnectionManager connectionManager;
 
     public GenreDBDAO(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
