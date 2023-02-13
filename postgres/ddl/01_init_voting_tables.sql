@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS app.genres(
     CONSTRAINT pk_genre_id PRIMARY KEY (id)
 );
 
-CREATE TABLE app.artist (
+CREATE TABLE app.artists (
     id BIGSERIAL NOT NULL,
     name TEXT NOT NULL,
     CONSTRAINT pk_artist_id PRIMARY KEY (id)
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS app.votes(
     email TEXT NOT NULL UNIQUE,
     CONSTRAINT pk_vote_id PRIMARY KEY (id),
     CONSTRAINT fk_artist_id FOREIGN KEY (artist_id)
-    REFERENCES app.artist (id)
+    REFERENCES app.artists (id)
 );
 
 CREATE TABLE IF NOT EXISTS app.votes_genres(

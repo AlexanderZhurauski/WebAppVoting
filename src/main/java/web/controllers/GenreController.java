@@ -21,7 +21,7 @@ public class GenreController {
     }
 
     @PostMapping("/genres")
-    public void postGenre(@RequestBody GenreDTO genre) {
+    public void postGenre(@RequestBody GenreInputDTO genre) {
         this.service.add(genre.getName());
     }
 

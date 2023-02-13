@@ -3,11 +3,11 @@ package dao.entity;
 import javax.persistence.*;
 import java.util.Objects;
 @Entity
-@Table (name = "artist", schema = "app")
+@Table (name = "artists", schema = "app")
 public class ArtistEntity {
     @Id
-    @GeneratedValue(generator = "artist_seq",strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name ="artist_seq",sequenceName = "artist_id_seq",schema = "app",allocationSize = 1)
+    @GeneratedValue(generator = "artists_seq",strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name ="artists_seq",sequenceName = "artists_id_seq",schema = "app",allocationSize = 1)
     private Long id;
     @Column(name = "name")
     private String artist;

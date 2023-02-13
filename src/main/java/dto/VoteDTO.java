@@ -5,10 +5,13 @@ import java.util.List;
 
 public class VoteDTO {
 
-    private final String email;
-    private final long artistId;
-    private final List<Long> genreIds;
-    private final String about;
+    private String email;
+    private long artistId;
+    private List<Long> genreIds;
+    private String about;
+
+    public VoteDTO() {
+    }
 
     public VoteDTO(long artistId, List<Long> genreIds, String about, String email) {
         this.artistId = artistId;
@@ -33,6 +36,22 @@ public class VoteDTO {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setArtistId(long artistId) {
+        this.artistId = artistId;
+    }
+
+    public void setGenreIds(List<Long> genreIds) {
+        this.genreIds = genreIds;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
     @Override
     public String toString() {
         return "VoteDTO{" +
@@ -42,4 +61,5 @@ public class VoteDTO {
                 ", about='" + about + '\'' +
                 '}';
     }
+
 }
