@@ -33,3 +33,16 @@ CREATE TABLE IF NOT EXISTS app.votes_genres(
     CONSTRAINT unique_vote UNIQUE(vote_id, genre_id)
 );
 
+CREATE TABLE app.emails
+(
+    id           BIGSERIAL  NOT NULL,
+    vote_id      BIGINT  NOT NULL,
+    recipient    TEXT    NOT NULL,
+    topic        TEXT    NOT NULL,
+    text_message TEXT    NOT NULL,
+    departures   INTEGER NOT NULL,
+    status       TEXT    NOT NULL,
+    CONSTRAINT pk_emails_id PRIMARY KEY (id),
+    CONSTRAINT fk_emails_vote_id FOREIGN KEY (vote_id)
+        REFERENCES app.votes (id)
+);

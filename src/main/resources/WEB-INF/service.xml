@@ -16,6 +16,7 @@
     <bean id="SenderService" class="service.SenderService">
         <constructor-arg name="genreService" ref="GenreService"/>
         <constructor-arg name="artistService" ref="ArtistService"/>
+        <constructor-arg name="emailDAO" ref="EmailDBDAO"/>
     </bean>
 
     <bean id="VoteService" class="service.VoteService">

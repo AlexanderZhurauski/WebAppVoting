@@ -1,13 +1,12 @@
-package controllers;
+package web.controllers;
 
 import dto.ArtistDTO;
-import org.springframework.beans.factory.annotation.Qualifier;
+import dto.ArtistInputDTO;
 import org.springframework.web.bind.annotation.*;
 import service.api.IArtistService;
 
 import java.util.List;
 
-@RequestMapping("/artists/*")
 @RestController
 public class ArtistController {
     private final IArtistService service;
@@ -16,19 +15,21 @@ public class ArtistController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/artists")
     public List<ArtistDTO> getArtists() {
         return this.service.getAll();
     }
 
-    @PostMapping
-    public void postArtist(@RequestBody ArtistDTO artist) {
-        this.service.add(artist.getArtist());
+    @PostMapping("/artists")
+    public void postArtist(@RequestBody ArtistInputDTO artist) {
+        this.service.add(artist.getName());
     }
 
-    @PatchMapping
-    public void updateArtist(@RequestBody ArtistDTO artist) {
-        this.service.update(artist.getId(), artist.getArtist());
+    @PutMapping("/artists/{id}/version/{versionId}")
+    public void updateArtist(@RequestBody ArtistInputDTO artist,
+                             @PathVariable Long id,
+                             @PathVariable Long versionId) {
+        this.service.update(id, artist.getName());
     }
 
     @DeleteMapping("/artists/{id}")

@@ -62,7 +62,7 @@ public class GenreService implements IGenreService {
 
     private boolean isDuplicate(String genre){
         return getAll().stream()
-                .map(GenreDTO::getGenre)
+                .map(GenreDTO::getName)
                 .anyMatch(nameGenre -> nameGenre.equalsIgnoreCase(genre));
     }
 }

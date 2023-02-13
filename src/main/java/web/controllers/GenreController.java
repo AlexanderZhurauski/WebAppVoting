@@ -1,13 +1,12 @@
-package controllers;
+package web.controllers;
 
 import dto.GenreDTO;
-import org.springframework.beans.factory.annotation.Qualifier;
+import dto.GenreInputDTO;
 import org.springframework.web.bind.annotation.*;
 import service.api.IGenreService;
 
 import java.util.List;
 
-@RequestMapping("/genres/*")
 @RestController
 public class GenreController {
     private final IGenreService service;
@@ -16,19 +15,21 @@ public class GenreController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/genres")
     public List<GenreDTO> getGenres() {
         return this.service.getAll();
     }
 
-    @PostMapping
+    @PostMapping("/genres")
     public void postGenre(@RequestBody GenreDTO genre) {
-        this.service.add(genre.getGenre());
+        this.service.add(genre.getName());
     }
 
-    @PatchMapping
-    public void updateGenre(@RequestBody GenreDTO genre) {
-        this.service.update(genre.getId(), genre.getGenre());
+    @PutMapping("/genres/{id}/version/{versionId}")
+    public void updateGenre(@RequestBody GenreInputDTO genre,
+                            @PathVariable Long id,
+                            @PathVariable Long versionId) {
+        this.service.update(id, genre.getName());
     }
 
     @DeleteMapping("/genres/{id}")

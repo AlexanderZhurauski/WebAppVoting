@@ -27,4 +27,8 @@
     <bean id="VoteDBDAO" class="dao.database.VoteDBDAO">
         <constructor-arg ref="ConnectionManager"/>
     </bean>
+
+    <bean id="EmailDBDAO" class="dao.database.EmailDBDAO">
+        <constructor-arg ref="ConnectionManager"/>
+    </bean>
 </beans>

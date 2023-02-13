@@ -17,6 +17,9 @@ public class ArtistEntity {
     public ArtistEntity(String artist){
         this.artist=artist;
     }
+    public ArtistEntity(Long id) {
+        this.id = id;
+    }
 
     public Long getId() {
         return id;

@@ -1,6 +1,9 @@
 package service;
 
 import dao.api.IVoteDAO;
+import dao.entity.ArtistEntity;
+import dao.entity.GenreEntity;
+import dao.entity.VoteEntity;
 import dto.SavedVoteDTO;
 import dto.VoteDTO;
 import service.api.IArtistService;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class VoteService implements IVoteService {
 
@@ -42,7 +46,9 @@ public class VoteService implements IVoteService {
 
     @Override
     public void save(SavedVoteDTO vote) {
-        voteDAO.save(vote);
+        VoteEntity voteEntity = convertToVoteEntity(vote);
+        voteDAO.save(voteEntity);
+        senderService.confirmVote(voteEntity);
     }
 
     @Override
@@ -103,5 +109,19 @@ public class VoteService implements IVoteService {
             throw new IllegalArgumentException("User provided " +
                     "an invalid email");
         }
+    }
+
+    private VoteEntity convertToVoteEntity(SavedVoteDTO savedVoteDTO) {
+        VoteDTO voteDTO = savedVoteDTO.getVoteDTO();
+        return new VoteEntity(
+                new ArtistEntity(voteDTO.getArtistId()),
+                voteDTO.getAbout(),
+                voteDTO.getGenreIds()
+                        .stream()
+                        .map(GenreEntity::new)
+                        .collect(Collectors.toList()),
+                savedVoteDTO.getCreateDataTime(),
+                voteDTO.getEmail()
+        );
     }
 }

@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,5 +104,24 @@ public class VoteDBDAO implements IVoteDAO {
                 entityManager.close();
             }
         }
+    }
+
+    @Override
+    public void save(VoteEntity vote) {
+        EntityManager entityManager = connectionManager.open();
+        entityManager.getTransaction().begin();
+
+
+        ArtistEntity artist = entityManager.find(ArtistEntity.class, vote.getArtistId().getId());
+        vote.setArtistId(artist);
+        List<GenreEntity> genres = vote.getGenreIds();
+        vote.setGenreIds(new ArrayList<>());
+        genres.stream()
+                .map(GenreEntity::getId)
+                .forEach(id -> vote.getGenreIds().add(entityManager.find(GenreEntity.class, id)));
+        entityManager.persist(vote);
+
+        entityManager.getTransaction().commit();
+        entityManager.close();
     }
 }

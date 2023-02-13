@@ -1,17 +1,16 @@
 package service.api;
 
-import dto.ArtistDTO;
-import dto.GenreDTO;
-import dto.StatisticsDTO;
+import dto.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 public interface IStatisticsService {
 
-    Map<ArtistDTO, Long> getBestArtists();
+    List<RankedArtistDTO> getBestArtists();
 
-    Map<GenreDTO, Long> getBestGenres();
+    List<RankedGenreDTO> getBestGenres();
 
     Map<LocalDateTime, String> getAbouts();
 

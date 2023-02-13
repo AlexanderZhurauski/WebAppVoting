@@ -14,7 +14,8 @@
     <import resource="dao.xml"/>
     <import resource="service.xml"/>
 
-    <context:component-scan base-package="controllers"/>
+    <context:component-scan base-package="web.controllers"/>
+    <context:component-scan base-package="web.listeners"/>
 
     <mvc:annotation-driven/>
 

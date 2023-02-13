@@ -1,27 +1,28 @@
 package dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 public class StatisticsDTO {
 
-    private final Map<ArtistDTO, Long> bestArtists;
-    private final Map<GenreDTO, Long> bestGenres;
+    private final List<RankedArtistDTO> bestArtists;
+    private final List<RankedGenreDTO> bestGenres;
     private final Map<LocalDateTime, String> abouts;
 
-    public StatisticsDTO(Map<ArtistDTO, Long> bestArtists,
-                         Map<GenreDTO, Long> bestGenres,
+    public StatisticsDTO(List<RankedArtistDTO> bestArtists,
+                         List<RankedGenreDTO> bestGenres,
                          Map<LocalDateTime, String> abouts) {
         this.bestArtists = bestArtists;
         this.bestGenres = bestGenres;
         this.abouts = abouts;
     }
 
-    public Map<ArtistDTO, Long> getBestArtists() {
+    public List<RankedArtistDTO> getBestArtists() {
         return bestArtists;
     }
 
-    public Map<GenreDTO, Long> getBestGenres() {
+    public List<RankedGenreDTO> getBestGenres() {
         return bestGenres;
     }
 

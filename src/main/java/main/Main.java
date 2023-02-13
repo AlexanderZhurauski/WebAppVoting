@@ -1,5 +1,6 @@
 package main;
 
+/*
 import dto.SavedVoteDTO;
 import dto.VoteDTO;
 import org.springframework.context.ApplicationContext;
@@ -9,9 +10,12 @@ import service.api.*;
 
 import java.util.List;
 
+ */
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        /*
         ApplicationContext xmlContext = new ClassPathXmlApplicationContext("WEB-INF/service.xml");
 
         IArtistService artistService = xmlContext.getBean("ArtistService",
@@ -39,37 +43,46 @@ public class Main {
                         + ": " + genre.getGenre()));
 
         System.out.println("----------------");
-        voteService.save(new SavedVoteDTO(new VoteDTO(1,
-                List.of(2L, 3L, 4L), "new message", "gandabbjlfdude@gmail.com")));
-        System.out.println("All votes:");
-        voteService
-                .getAll()
-                .forEach(vote -> {
-                    String voteText = vote.getCreateDataTime() + ":\n";
-                    voteText += vote.getVoteDTO().getArtistId() + "\n";
-                    voteText += vote.getVoteDTO().getGenreIds() + "\n";
-                    voteText += vote.getVoteDTO().getAbout() + "\n";
-                    voteText += vote.getVoteDTO().getEmail();
-                    System.out.println(voteText);
-                });
+        try {
+            senderService.initializeSendingService();
+            voteService.save(new SavedVoteDTO(new VoteDTO(1,
+                    List.of(2L, 3L, 4L), "new message", "gandalfdude@gmail.com")));
+            System.out.println("All votes:");
+            Thread.sleep(10_000);
+            voteService
+                    .getAll()
+                    .forEach(vote -> {
+                        String voteText = vote.getCreateDataTime() + ":\n";
+                        voteText += vote.getVoteDTO().getArtistId() + "\n";
+                        voteText += vote.getVoteDTO().getGenreIds() + "\n";
+                        voteText += vote.getVoteDTO().getAbout() + "\n";
+                        voteText += vote.getVoteDTO().getEmail();
+                        System.out.println(voteText);
+                    });
 
-        statisticsService
-                .getAbouts()
-                .values()
-                .forEach(System.out::println);
-        System.out.println("----------------");
+            statisticsService
+                    .getAbouts()
+                    .values()
+                    .forEach(System.out::println);
+            System.out.println("----------------");
 
-        statisticsService
-                .getBestArtists()
-                .entrySet()
-                .forEach(key -> System.out.println(
-                        key.getKey().getArtist() + ": " + key.getValue()));
-        System.out.println("----------------");
+            statisticsService
+                    .getBestArtists()
+                    .entrySet()
+                    .forEach(key -> System.out.println(
+                            key.getKey().getArtist() + ": " + key.getValue()));
+            System.out.println("----------------");
 
-        statisticsService
-                .getBestGenres()
-                .entrySet()
-                .forEach(key -> System.out.println(
-                        key.getKey().getGenre() + ": " + key.getValue()));
+            statisticsService
+                    .getBestGenres()
+                    .entrySet()
+                    .forEach(key -> System.out.println(
+                            key.getKey().getGenre() + ": " + key.getValue()));
+            senderService.stopSendingService();
+        } catch (Exception e) {
+            senderService.stopSendingService();
+        }
+
+         */
     }
 }

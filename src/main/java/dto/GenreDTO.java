@@ -7,24 +7,24 @@ import java.util.Objects;
 public class GenreDTO {
 
     private final long id;
-    private final String genre;
+    private final String name;
 
-    public GenreDTO(int id, String genre) {
+    public GenreDTO(int id, String name) {
         this.id = id;
-        this.genre = genre;
+        this.name = name;
     }
 
     public GenreDTO(GenreEntity entity) {
         this.id = entity.getId().intValue();
-        this.genre = entity.getGenre();
+        this.name = entity.getGenre();
     }
 
     public long getId() {
         return id;
     }
 
-    public String getGenre() {
-        return genre;
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -32,11 +32,11 @@ public class GenreDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GenreDTO genreDTO = (GenreDTO) o;
-        return id == genreDTO.id && genre.equals(genreDTO.genre);
+        return id == genreDTO.id && name.equals(genreDTO.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, genre);
+        return Objects.hash(id, name);
     }
 }

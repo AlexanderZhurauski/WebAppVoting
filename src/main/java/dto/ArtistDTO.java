@@ -7,24 +7,24 @@ import java.util.Objects;
 public class ArtistDTO {
 
     private final long id;
-    private final String artist;
+    private final String name;
 
-    public ArtistDTO(long id, String artist) {
+    public ArtistDTO(long id, String name) {
         this.id = id;
-        this.artist = artist;
+        this.name = name;
     }
 
     public ArtistDTO(ArtistEntity entity) {
         this.id = entity.getId().intValue();
-        this.artist = entity.getArtist();
+        this.name = entity.getArtist();
     }
 
     public long getId() {
         return id;
     }
 
-    public String getArtist() {
-        return artist;
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -32,11 +32,11 @@ public class ArtistDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ArtistDTO that = (ArtistDTO) o;
-        return id == that.id && artist.equals(that.artist);
+        return id == that.id && name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, artist);
+        return Objects.hash(id, name);
     }
 }
