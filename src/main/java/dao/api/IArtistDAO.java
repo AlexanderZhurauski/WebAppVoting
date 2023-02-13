@@ -1,6 +1,7 @@
 package dao.api;
 
 import dto.ArtistDTO;
+import dto.ArtistInputDTO;
 
 import java.util.List;
 
@@ -8,13 +9,13 @@ public interface IArtistDAO {
 
     List<ArtistDTO> getAll();
 
-    boolean exists(long id);
+    boolean exists(Long id);
 
-    ArtistDTO get(long id);
+    ArtistDTO get(Long id);
 
-    void add(String artist);
+    void add(ArtistInputDTO artist);
 
-    void update(long id, String artist);
+    void update(Long id, ArtistInputDTO artist);
 
-    void delete(long id);
+    void delete(Long id);
 }

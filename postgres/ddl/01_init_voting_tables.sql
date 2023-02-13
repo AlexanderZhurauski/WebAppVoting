@@ -2,12 +2,14 @@ CREATE SCHEMA IF NOT EXISTS app;
 
 CREATE TABLE IF NOT EXISTS app.genres(
     id BIGSERIAL NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
     name VARCHAR(30) NOT NULL UNIQUE,
     CONSTRAINT pk_genre_id PRIMARY KEY (id)
 );
 
 CREATE TABLE app.artists (
     id BIGSERIAL NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
     name TEXT NOT NULL,
     CONSTRAINT pk_artist_id PRIMARY KEY (id)
 );

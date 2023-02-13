@@ -22,14 +22,14 @@ public class GenreController {
 
     @PostMapping("/genres")
     public void postGenre(@RequestBody GenreInputDTO genre) {
-        this.service.add(genre.getName());
+        this.service.add(genre);
     }
 
     @PutMapping("/genres/{id}/version/{versionId}")
     public void updateGenre(@RequestBody GenreInputDTO genre,
                             @PathVariable Long id,
                             @PathVariable Long versionId) {
-        this.service.update(id, genre.getName());
+        this.service.update(id, versionId, genre);
     }
 
     @DeleteMapping("/genres/{id}")

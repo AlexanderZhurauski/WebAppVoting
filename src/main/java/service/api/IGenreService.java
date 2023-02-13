@@ -1,6 +1,7 @@
 package service.api;
 
 import dto.GenreDTO;
+import dto.GenreInputDTO;
 
 import java.util.List;
 
@@ -8,13 +9,13 @@ public interface IGenreService {
 
     List<GenreDTO> getAll();
 
-    GenreDTO get(long id);
+    GenreDTO get(Long id);
 
-    boolean exists(long id);
+    boolean exists(Long id);
 
-    void add(String genre);
+    void add(GenreInputDTO genre);
 
-    void update(long id, String genre);
+    void update(Long id, Long version, GenreInputDTO genre);
 
-    void delete(long id);
+    void delete(Long id);
 }

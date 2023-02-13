@@ -6,25 +6,32 @@ import java.util.Objects;
 
 public class ArtistDTO {
 
-    private final long id;
+    private final Long id;
+    private final Long version;
     private final String name;
 
-    public ArtistDTO(long id, String name) {
+    public ArtistDTO(Long id, Long version, String name) {
         this.id = id;
+        this.version = version;
         this.name = name;
     }
 
     public ArtistDTO(ArtistEntity entity) {
-        this.id = entity.getId().intValue();
+        this.id = entity.getId();
+        this.version = entity.getVersion();
         this.name = entity.getArtist();
     }
 
-    public long getId() {
-        return id;
+    public Long getId() {
+        return this.id;
     }
 
     public String getName() {
-        return name;
+        return this.name;
+    }
+
+    public Long getVersion() {
+        return this.version;
     }
 
     @Override
@@ -32,11 +39,11 @@ public class ArtistDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ArtistDTO that = (ArtistDTO) o;
-        return id == that.id && name.equals(that.name);
+        return this.id == that.id && this.name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(this.id, this.name);
     }
 }

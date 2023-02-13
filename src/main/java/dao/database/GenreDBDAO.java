@@ -4,6 +4,7 @@ import dao.api.IGenreDAO;
 import dao.entity.GenreEntity;
 import dao.util.ConnectionManager;
 import dto.GenreDTO;
+import dto.GenreInputDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -43,7 +44,7 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public boolean exists(long id) {
+    public boolean exists(Long id) {
         boolean bool = false;
         EntityManager entityManager = null;
         try {
@@ -69,7 +70,7 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public GenreDTO get(long id) {
+    public GenreDTO get(Long id) {
         EntityManager entityManager = null;
         GenreDTO genreDTO;
         try {
@@ -94,12 +95,12 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public void add(String genre) {
+    public void add(GenreInputDTO genre) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
-            entityManager.persist(new GenreEntity(genre));
+            entityManager.persist(new GenreEntity(genre.getName()));
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {
@@ -114,13 +115,13 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public void update(long id, String genre) {
+    public void update(Long id, GenreInputDTO genre) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
-            genreEntity.setGenre(genre);
+            genreEntity.setGenre(genre.getName());
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {
@@ -135,7 +136,7 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();

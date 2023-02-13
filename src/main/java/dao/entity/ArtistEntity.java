@@ -9,6 +9,9 @@ public class ArtistEntity {
     @GeneratedValue(generator = "artists_seq",strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name ="artists_seq",sequenceName = "artists_id_seq",schema = "app",allocationSize = 1)
     private Long id;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Column(name = "name")
     private String artist;
 
@@ -22,11 +25,15 @@ public class ArtistEntity {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public String getArtist() {
-        return artist;
+        return this.artist;
+    }
+
+    public Long getVersion() {
+        return this.version;
     }
 
     public void setArtist(String artist) {
@@ -36,16 +43,21 @@ public class ArtistEntity {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ArtistEntity that = (ArtistEntity) o;
-        return id == that.id && Objects.equals(artist, that.artist);
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, artist);
+        return Objects.equals(id, that.id) && Objects.equals(version, that.version) && Objects.equals(artist, that.artist);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, version, artist);
+    }
 }

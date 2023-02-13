@@ -4,8 +4,10 @@ import dao.api.IArtistDAO;
 import dao.entity.ArtistEntity;
 import dao.util.ConnectionManager;
 import dto.ArtistDTO;
+import dto.ArtistInputDTO;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +50,7 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public boolean exists(long id) {
+    public boolean exists(Long id) {
         EntityManager entityManager = null;
         boolean bool = false;
 
@@ -76,7 +78,7 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public ArtistDTO get(long id) {
+    public ArtistDTO get(Long id) {
         EntityManager entityManager = null;
         ArtistDTO artistDTO;
         try {
@@ -104,13 +106,13 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public void add(String artist) {
+    public void add(ArtistInputDTO artist) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
 
-            entityManager.persist(new ArtistEntity(artist));
+            entityManager.persist(new ArtistEntity(artist.getName()));
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {
@@ -126,14 +128,15 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public void update(long id, String artist) {
+    public void update(Long id, ArtistInputDTO artist) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
 
-            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
-            artistEntity.setArtist(artist);
+            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id,
+                    LockModeType.OPTIMISTIC);
+            artistEntity.setArtist(artist.getName());
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {
@@ -149,7 +152,7 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
         EntityManager entityManager = null;
 
         try {

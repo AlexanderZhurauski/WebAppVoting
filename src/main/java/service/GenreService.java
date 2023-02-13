@@ -2,9 +2,11 @@ package service;
 
 import dao.api.IGenreDAO;
 import dto.GenreDTO;
+import dto.GenreInputDTO;
 import service.api.IGenreService;
 
 import java.util.List;
+import java.util.Objects;
 
 public class GenreService implements IGenreService {
 
@@ -20,18 +22,18 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public GenreDTO get(long id) {
+    public GenreDTO get(Long id) {
         return dataSource.get(id);
     }
 
     @Override
-    public boolean exists(long id) {
+    public boolean exists(Long id) {
         return dataSource.exists(id);
     }
 
     @Override
-    public void add(String genre) {
-        boolean isDuplicate = isDuplicate(genre);
+    public void add(GenreInputDTO genre) {
+        boolean isDuplicate = isDuplicate(genre.getName());
         if (isDuplicate) {
             throw new IllegalArgumentException("This genre has already " +
                     "been added");
@@ -41,18 +43,29 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public void update(long id, String genre) {
-        boolean isDuplicate = isDuplicate(genre);
-        if (dataSource.exists(id) && !isDuplicate) {
-            dataSource.update(id, genre);
-        } else {
+    public void update(Long id, Long version, GenreInputDTO genre) {
+        GenreDTO genreDTO = dataSource.get(id);
+        if (genreDTO == null) {
             throw new IllegalArgumentException("No genre updated for id " +
-                    id + " or genre has already been added");
+                    id + " as it doesn't exist.");
         }
+        if (!Objects.equals(genreDTO.getVersion(), version)) {
+            throw new IllegalArgumentException("No genre updated for id " +
+                    id + ". Invalid version provided.");
+        }
+        String genreName = genre.getName();
+        if (genreName == null || genreName.isBlank()) {
+            throw new IllegalArgumentException("No genre name has been provided!");
+        }
+        if (isDuplicate(genreName)) {
+            throw new IllegalArgumentException("Genre " + genreName
+                    + " already exists!");
+        }
+        dataSource.update(id, genre);
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
         if (dataSource.exists(id)) {
             dataSource.delete(id);
         } else {

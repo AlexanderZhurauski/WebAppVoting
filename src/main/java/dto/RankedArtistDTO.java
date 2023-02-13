@@ -1,7 +1,10 @@
 package dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
 public class RankedArtistDTO {
 
+    @JsonUnwrapped
     private ArtistDTO artist;
     private Long votes;
 

@@ -6,25 +6,31 @@ import java.util.Objects;
 
 public class GenreDTO {
 
-    private final long id;
+    private final Long id;
+    private final Long version;
     private final String name;
 
-    public GenreDTO(int id, String name) {
+    public GenreDTO(Long id, Long version, String name) {
         this.id = id;
+        this.version = version;
         this.name = name;
     }
 
     public GenreDTO(GenreEntity entity) {
-        this.id = entity.getId().intValue();
+        this.id = entity.getId();
+        this.version = entity.getVersion();
         this.name = entity.getGenre();
     }
 
-    public long getId() {
-        return id;
+    public Long getId() {
+        return this.id;
     }
 
     public String getName() {
-        return name;
+        return this.name;
+    }
+    public Long getVersion() {
+        return this.version;
     }
 
     @Override
@@ -32,11 +38,11 @@ public class GenreDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GenreDTO genreDTO = (GenreDTO) o;
-        return id == genreDTO.id && name.equals(genreDTO.name);
+        return this.id == genreDTO.id && this.name.equals(genreDTO.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(this.id, this.name);
     }
 }

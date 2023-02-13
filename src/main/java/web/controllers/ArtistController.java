@@ -22,14 +22,14 @@ public class ArtistController {
 
     @PostMapping("/artists")
     public void postArtist(@RequestBody ArtistInputDTO artist) {
-        this.service.add(artist.getName());
+        this.service.add(artist);
     }
 
     @PutMapping("/artists/{id}/version/{versionId}")
     public void updateArtist(@RequestBody ArtistInputDTO artist,
                              @PathVariable Long id,
                              @PathVariable Long versionId) {
-        this.service.update(id, artist.getName());
+        this.service.update(id, versionId, artist);
     }
 
     @DeleteMapping("/artists/{id}")
