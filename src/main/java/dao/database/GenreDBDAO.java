@@ -3,12 +3,9 @@ package dao.database;
 import dao.api.IGenreDAO;
 import dao.entity.GenreEntity;
 import dao.util.ConnectionManager;
-import dto.GenreDTO;
-import dto.GenreInputDTO;
 
 import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GenreDBDAO implements IGenreDAO {
 
@@ -18,17 +15,17 @@ public class GenreDBDAO implements IGenreDAO {
         this.connectionManager = connectionManager;
     }
     @Override
-    public List<GenreDTO> getAll() {
+    public List<GenreEntity> getAll() {
         EntityManager entityManager = null;
-        List<GenreDTO> list;
+        List<GenreEntity> list;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
+
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
             list = entityManager.createQuery("SELECT g FROM GenreEntity g", GenreEntity.class)
-                    .getResultStream()
-                    .map(GenreDTO::new)
-                    .collect(Collectors.toList());
+                    .getResultList();
+
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {
@@ -70,15 +67,16 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public GenreDTO get(Long id) {
+    public GenreEntity get(Long id) {
         EntityManager entityManager = null;
-        GenreDTO genreDTO;
+        GenreEntity genre;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
-            genreDTO = new GenreDTO(entityManager.find(GenreEntity.class, id));
+            genre = entityManager.find(GenreEntity.class, id);
+
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {
@@ -91,16 +89,18 @@ public class GenreDBDAO implements IGenreDAO {
             }
         }
 
-        return genreDTO;
+        return genre;
     }
 
     @Override
-    public void add(GenreInputDTO genre) {
+    public void add(GenreEntity genre) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
-            entityManager.persist(new GenreEntity(genre.getName()));
+
+            entityManager.persist(genre);
+
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {
@@ -115,13 +115,14 @@ public class GenreDBDAO implements IGenreDAO {
     }
 
     @Override
-    public void update(Long id, GenreInputDTO genre) {
+    public void update(GenreEntity genre) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
-            GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
-            genreEntity.setGenre(genre.getName());
+
+            entityManager.merge(genre);
+
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {
@@ -141,8 +142,10 @@ public class GenreDBDAO implements IGenreDAO {
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
+
             GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
             entityManager.remove(genreEntity);
+
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager != null && entityManager.getTransaction().isActive()) {
