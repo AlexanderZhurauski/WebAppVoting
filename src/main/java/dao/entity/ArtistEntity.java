@@ -17,11 +17,19 @@ public class ArtistEntity {
 
     public ArtistEntity(){
     }
-    public ArtistEntity(String artist){
-        this.artist=artist;
+
+    public ArtistEntity(String artist) {
+        this.artist = artist;
     }
+
     public ArtistEntity(Long id) {
         this.id = id;
+    }
+
+    public ArtistEntity(Long id, Long version, String artist) {
+        this.id = id;
+        this.version = version;
+        this.artist = artist;
     }
 
     public Long getId() {

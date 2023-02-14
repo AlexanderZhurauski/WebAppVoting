@@ -3,13 +3,9 @@ package dao.database;
 import dao.api.IArtistDAO;
 import dao.entity.ArtistEntity;
 import dao.util.ConnectionManager;
-import dto.ArtistDTO;
-import dto.ArtistInputDTO;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ArtistDBDAO implements IArtistDAO {
 
@@ -20,9 +16,9 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public List<ArtistDTO> getAll() {
+    public List<ArtistEntity> getAll() {
         EntityManager entityManager = null;
-        List<ArtistDTO> list;
+        List<ArtistEntity> list;
 
         try {
             entityManager = connectionManager.open();
@@ -30,9 +26,7 @@ public class ArtistDBDAO implements IArtistDAO {
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
             list = entityManager.createQuery("SELECT a FROM ArtistEntity a", ArtistEntity.class)
-                    .getResultStream()
-                    .map(ArtistDTO::new)
-                    .collect(Collectors.toList());
+                    .getResultList();
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {
@@ -78,16 +72,15 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public ArtistDTO get(Long id) {
+    public ArtistEntity get(Long id) {
         EntityManager entityManager = null;
-        ArtistDTO artistDTO;
+        ArtistEntity artist;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
             entityManager.createNativeQuery("SET TRANSACTION READ ONLY;").executeUpdate();
 
-            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id);
-            artistDTO = new ArtistDTO(artistEntity);
+            artist = entityManager.find(ArtistEntity.class, id);
 
             entityManager.getTransaction().commit();
 
@@ -102,17 +95,17 @@ public class ArtistDBDAO implements IArtistDAO {
             }
         }
 
-        return artistDTO;
+        return artist;
     }
 
     @Override
-    public void add(ArtistInputDTO artist) {
+    public void add(ArtistEntity artist) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
 
-            entityManager.persist(new ArtistEntity(artist.getName()));
+            entityManager.persist(artist);
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {
@@ -128,15 +121,13 @@ public class ArtistDBDAO implements IArtistDAO {
     }
 
     @Override
-    public void update(Long id, ArtistInputDTO artist) {
+    public void update(ArtistEntity artist) {
         EntityManager entityManager = null;
         try {
             entityManager = connectionManager.open();
             entityManager.getTransaction().begin();
 
-            ArtistEntity artistEntity = entityManager.find(ArtistEntity.class, id,
-                    LockModeType.OPTIMISTIC);
-            artistEntity.setArtist(artist.getName());
+            entityManager.merge(artist);
 
             entityManager.getTransaction().commit();
         } catch (Exception e) {

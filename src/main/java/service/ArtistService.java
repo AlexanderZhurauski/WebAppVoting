@@ -1,12 +1,14 @@
 package service;
 
 import dao.api.IArtistDAO;
+import dao.entity.ArtistEntity;
 import dto.ArtistDTO;
 import dto.ArtistInputDTO;
 import service.api.IArtistService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ArtistService implements IArtistService {
 
@@ -18,7 +20,7 @@ public class ArtistService implements IArtistService {
 
     @Override
     public List<ArtistDTO> getAll() {
-        return dataSource.getAll();
+        return convertFromEntityList(dataSource.getAll());
     }
 
     @Override
@@ -28,7 +30,7 @@ public class ArtistService implements IArtistService {
 
     @Override
     public ArtistDTO get(Long id) {
-        return dataSource.get(id);
+        return convertFromEntity(dataSource.get(id));
     }
 
     @Override
@@ -37,25 +39,27 @@ public class ArtistService implements IArtistService {
         if (artistName == null || artistName.isBlank()) {
             throw new IllegalArgumentException("No artist name has been provided!");
         }
-        dataSource.add(artist);
+        dataSource.add(convertToEntity(artist));
     }
 
     @Override
     public void update(Long id, Long version, ArtistInputDTO artist) {
-        ArtistDTO artistDTO = dataSource.get(id);
-        if (artistDTO == null) {
+        ArtistEntity artistEntity = dataSource.get(id);
+        if (artistEntity == null) {
             throw new IllegalArgumentException("No artist updated for id " + id
                     + " as it doesn't exist.");
         }
-        if (!Objects.equals(artistDTO.getVersion(), version)) {
+        if (!Objects.equals(artistEntity.getVersion(), version)) {
             throw new IllegalArgumentException("No artist updated for id " + id
                     + ". Invalid version provided.");
         }
-        String artistName = artistDTO.getName();
+        String artistName = artist.getName();
         if (artistName == null || artistName.isBlank()) {
             throw new IllegalArgumentException("No artist name has been provided!");
         }
-        dataSource.update(id, artist);
+        artistEntity.setArtist(artist.getName());
+
+        dataSource.update(artistEntity);
     }
 
     @Override
@@ -66,4 +70,19 @@ public class ArtistService implements IArtistService {
             throw new IllegalArgumentException("No artist deleted for id " + id);
         }
     }
-}
+
+    private ArtistDTO convertFromEntity(ArtistEntity artist) {
+        return new ArtistDTO(artist);
+    }
+
+    private List<ArtistDTO> convertFromEntityList(List<ArtistEntity> artists) {
+        return artists
+                .stream()
+                .map(this::convertFromEntity)
+                .collect(Collectors.toList());
+    }
+
+    private ArtistEntity convertToEntity(ArtistInputDTO artist) {
+        return new ArtistEntity(artist.getName());
+    }
+ }
