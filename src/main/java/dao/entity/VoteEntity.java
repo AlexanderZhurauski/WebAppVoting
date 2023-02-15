@@ -13,7 +13,7 @@ public class VoteEntity {
     @GeneratedValue(generator = "votes_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "votes_seq", sequenceName = "votes_id_seq", schema = "app", allocationSize = 1)
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artist_id")
     private ArtistEntity artistId;
     @ManyToMany(fetch = FetchType.LAZY)

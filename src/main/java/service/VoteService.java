@@ -41,7 +41,7 @@ public class VoteService implements IVoteService {
 
     @Override
     public List<SavedVoteDTO> getAll() {
-        return voteDAO.getAll();
+        return convertFromVoteEntityList(voteDAO.getAll());
     }
 
     @Override
@@ -123,5 +123,16 @@ public class VoteService implements IVoteService {
                 savedVoteDTO.getCreateDataTime(),
                 voteDTO.getEmail()
         );
+    }
+
+    private List<SavedVoteDTO> convertFromVoteEntityList(List<VoteEntity> voteEntities) {
+        return voteEntities.stream()
+                .map(vote -> new SavedVoteDTO(new VoteDTO(
+                        vote.getArtistId().getId(),
+                        vote.getGenreIds().stream().map(GenreEntity::getId).collect(Collectors.toList()),
+                        vote.getAbout(),
+                        vote.getEmail()
+                ), vote.getCreationTime()))
+                .collect(Collectors.toList());
     }
 }
